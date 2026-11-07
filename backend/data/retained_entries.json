@@ -1,0 +1,1474 @@
+[
+  {
+    "id": "INC-001",
+    "title": "PostgreSQL connection pool exhausted. 504 Gateway Timeouts surging across checkout flow.",
+    "service": "payments-api",
+    "severity": "CRITICAL",
+    "root_cause": "A slow query in the fraud check module locked transactions without closing db connections, draining pgbouncer pool.",
+    "fix_steps": [
+      "Terminate blocking idle-in-transaction backend PIDs in postgres",
+      "Temporarily increase pgbouncer pool_size from 200 to 400",
+      "Deploy patch v2.14.1 with 3000ms statement_timeout on fraud query"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart payments-api pods",
+        "reason": "Restarting pods flooded postgres with 500 new connection handshakes simultaneously, causing a full DB CPU spike to 100%."
+      }
+    ],
+    "minutes_to_resolve": 55,
+    "source": "seeded",
+    "retained_at": "2026-11-07T04:34:45.702501+00:00",
+    "raw_incident": {
+      "id": "INC-001",
+      "service": "payments-api",
+      "severity": "CRITICAL",
+      "date": "2026-05-14T03:15:00Z",
+      "alert": "PostgreSQL connection pool exhausted. 504 Gateway Timeouts surging across checkout flow.",
+      "logs": "[ERROR] 2026-05-14 03:14:22 [payments-api] pool.go:142: pool exhausted: max_connections=200 reached\n[ERROR] 2026-05-14 03:14:23 [payments-api] handler.go:88: db query timeout after 5000ms: context deadline exceeded\n[WARN]  2026-05-14 03:14:25 [payments-api] pgbouncer: server connections saturated (200/200 active)",
+      "root_cause": "A slow query in the fraud check module locked transactions without closing db connections, draining pgbouncer pool.",
+      "fix_steps": [
+        "Terminate blocking idle-in-transaction backend PIDs in postgres",
+        "Temporarily increase pgbouncer pool_size from 200 to 400",
+        "Deploy patch v2.14.1 with 3000ms statement_timeout on fraud query"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart payments-api pods",
+          "reason": "Restarting pods flooded postgres with 500 new connection handshakes simultaneously, causing a full DB CPU spike to 100%."
+        }
+      ],
+      "runbook": "runbooks/database-pool-exhaustion.md",
+      "minutes_to_resolve": 55,
+      "engineer": "Marcus Vance",
+      "post_mortem_lesson": "Never restart API pods during connection exhaustion without capping connection rates in pgbouncer.",
+      "outcome": "RESOLVED"
+    }
+  },
+  {
+    "id": "INC-002",
+    "title": "Redis OOM command not allowed when used memory > 'maxmemory'.",
+    "service": "cart-cache",
+    "severity": "HIGH",
+    "root_cause": "Redis cluster maxmemory-policy was configured to 'noeviction' instead of 'volatile-lru', preventing automatic key expiration.",
+    "fix_steps": [
+      "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary",
+      "Manually trigger UNLINK on expired session keys batch",
+      "Commit terraform update setting maxmemory_policy = 'allkeys-lru'"
+    ],
+    "failed_attempts": [
+      {
+        "step": "FLUSHDB cache",
+        "reason": "Flush caused cache stampede that knocked over the MySQL replica cluster immediately."
+      }
+    ],
+    "minutes_to_resolve": 32,
+    "source": "seeded",
+    "retained_at": "2026-11-07T04:34:45.706326+00:00",
+    "raw_incident": {
+      "id": "INC-002",
+      "service": "cart-cache",
+      "severity": "HIGH",
+      "date": "2026-06-02T14:40:00Z",
+      "alert": "Redis OOM command not allowed when used memory > 'maxmemory'.",
+      "logs": "[ERROR] 2026-06-02 14:39:10 [cart-cache] OOM command not allowed when used memory > 'maxmemory' (8589934592 bytes)\n[WARN]  2026-06-02 14:39:12 [cart-cache] maxmemory-policy is 'noeviction', cannot evict keys\n[ERROR] 2026-06-02 14:39:15 [cart-cache] write operation 'SET session:usr_991823' failed",
+      "root_cause": "Redis cluster maxmemory-policy was configured to 'noeviction' instead of 'volatile-lru', preventing automatic key expiration.",
+      "fix_steps": [
+        "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary",
+        "Manually trigger UNLINK on expired session keys batch",
+        "Commit terraform update setting maxmemory_policy = 'allkeys-lru'"
+      ],
+      "failed_attempts": [
+        {
+          "step": "FLUSHDB cache",
+          "reason": "Flush caused cache stampede that knocked over the MySQL replica cluster immediately."
+        }
+      ],
+      "runbook": "runbooks/redis-memory-alert.md",
+      "minutes_to_resolve": 32,
+      "engineer": "Elena Rostova",
+      "post_mortem_lesson": "All cache clusters must have LRU eviction enabled and never execute FLUSHDB during peak traffic.",
+      "outcome": "RESOLVED"
+    }
+  },
+  {
+    "id": "INC-004",
+    "title": "Disk full from log growth detected in search-indexer",
+    "service": "search-indexer",
+    "severity": "CRITICAL",
+    "root_cause": "Core dumps from intermittent crashes accumulated in /var/crash without automatic purging.",
+    "fix_steps": [
+      "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+      "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+      "Execute growpart and resize2fs to extend volume partition",
+      "Verify logrotate cron script executes successfully"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute rm -f /var/log/audit.log while process is active",
+        "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+      },
+      {
+        "step": "Resize EBS volume without extending Linux filesystem",
+        "reason": "AWS volume showed 100GB but ext4 filesystem remained constrained to 20GB, leaving disk full."
+      }
+    ],
+    "minutes_to_resolve": 90,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:36.308289+00:00",
+    "raw_incident": {
+      "id": "INC-004",
+      "title": "Disk full from log growth detected in search-indexer",
+      "date": "2026-05-12T12:43:00+00:00",
+      "service": "search-indexer",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "Disk full alert: /var volume on search-indexer reached 100% capacity.",
+      "logs": "[FATAL] 2026-05-12 12:43:00 [audit-collector] write /var/log/audit/audit.log: no space left on device\n[ERROR] 2026-05-12 12:43:00 [kafka-broker] disk space exhausted on log.dirs=/data/kafka: 0 bytes free (100% utilized)\n[ERROR] 2026-05-12 12:43:00 [audit-collector] logger.go:189: failed to append audit event to disk: ENOSPC\n[WARN]  2026-05-12 12:43:00 [node-exporter] filesystem_free_bytes{mountpoint=\"/var\"} is 0\n[ERROR] 2026-05-12 12:43:00 [kafka-broker] segment.go:88: failed to flush commit log: No space left on device\n[FATAL] 2026-05-12 12:43:00 [kafka-broker] kafka.common.KafkaStorageException: I/O error in append to segment 0000000000049281\n[ERROR] 2026-05-12 12:43:00 [audit-collector] backpressure buffer full: dropping 1500 incoming audit events/sec\n[WARN]  2026-05-12 12:43:00 [systemd] journald: dropped 4920 log messages due to rate limiting and full buffer",
+      "root_cause": "Core dumps from intermittent crashes accumulated in /var/crash without automatic purging.",
+      "root_cause_family": "Disk full from log growth",
+      "fix_steps": [
+        "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+        "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+        "Execute growpart and resize2fs to extend volume partition",
+        "Verify logrotate cron script executes successfully"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute rm -f /var/log/audit.log while process is active",
+          "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+        },
+        {
+          "step": "Resize EBS volume without extending Linux filesystem",
+          "reason": "AWS volume showed 100GB but ext4 filesystem remained constrained to 20GB, leaving disk full."
+        }
+      ],
+      "runbook": "runbooks/disk-space-recovery.md",
+      "minutes_to_resolve": 90,
+      "engineer": "Carlos Mendez",
+      "post_mortem_lesson": "Never delete active open logs with rm; use truncate and enforce disk watermarks at 80%.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-006",
+    "title": "Service memory leak detected in image-resizer",
+    "service": "image-resizer",
+    "severity": "HIGH",
+    "root_cause": "Unbounded in-memory LRU cache in recommendation service lacked eviction policy for anonymous user IDs.",
+    "fix_steps": [
+      "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+      "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+      "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+        "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+      },
+      {
+        "step": "Disable Kubernetes liveness probe",
+        "reason": "Pod hung indefinitely in thrashing swap memory state, refusing traffic while failing to restart."
+      }
+    ],
+    "minutes_to_resolve": 90,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:44.672207+00:00",
+    "raw_incident": {
+      "id": "INC-006",
+      "title": "Service memory leak detected in image-resizer",
+      "date": "2026-05-21T17:32:00+00:00",
+      "service": "image-resizer",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "OOMKilled container restart loop in image-resizer. Memory allocation rate abnormal.",
+      "logs": "[WARN]  2026-05-21 17:32:00 [websocket-hub] container memory usage reached 94.2% of limit (3.78Gi / 4.0Gi)\n[ERROR] 2026-05-21 17:32:00 [websocket-hub] go_memstats_alloc_bytes: continuous growth from 400MB to 3.8GB in 45m\n[FATAL] 2026-05-21 17:32:00 [websocket-hub] kernel: [89124.912] oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,task=websocket-hub\n[ERROR] 2026-05-21 17:32:00 [websocket-hub] kubelet: Container websocket-hub in pod websocket-hub-84b2c-29m1 was OOMKilled (exit code 137)\n[WARN]  2026-05-21 17:32:00 [websocket-hub] 14,000 active client connections abruptly terminated\n[ERROR] 2026-05-21 17:32:00 [websocket-hub] pprof: heap profile indicates 2,400,000 active goroutines blocked in channel write\n[WARN]  2026-05-21 17:32:00 [websocket-hub] client reconnect wave causing CPU spike to 95% on replacement pod\n[FATAL] 2026-05-21 17:32:00 [websocket-hub] replacement pod also reaching 80% memory limit within 15 minutes",
+      "root_cause": "Unbounded in-memory LRU cache in recommendation service lacked eviction policy for anonymous user IDs.",
+      "root_cause_family": "Service memory leak",
+      "fix_steps": [
+        "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+        "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+        "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+          "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+        },
+        {
+          "step": "Disable Kubernetes liveness probe",
+          "reason": "Pod hung indefinitely in thrashing swap memory state, refusing traffic while failing to restart."
+        }
+      ],
+      "runbook": "runbooks/oom-killed-service.md",
+      "minutes_to_resolve": 90,
+      "engineer": "Aisha Al-Mansoor",
+      "post_mortem_lesson": "Profile heap usage during staging load tests and never remove goroutine context cancellation hooks.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-007",
+    "title": "MQTT broker overload detected in device-tracker",
+    "service": "device-tracker",
+    "severity": "CRITICAL",
+    "root_cause": "Broker TCP keepalive timeout was set too high (120s), keeping zombie connections active during cellular outages.",
+    "fix_steps": [
+      "Enable rate-limiting token bucket at edge load balancer to throttle incoming CONNECT packets to 500/sec",
+      "Temporarily change subscriber wildcard topic to specific tenant partitions",
+      "Tune Mosquitto max_queued_messages to 5000 and max_connections to 25000 with connection jitter"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart MQTT broker daemon immediately",
+        "reason": "Restart triggered an instant reconnect storm from 80,000 disconnected devices that locked the network interface."
+      },
+      {
+        "step": "Enable max_inflight_messages = 0 (unlimited)",
+        "reason": "Depleted broker memory within 90 seconds, causing kernel panic."
+      }
+    ],
+    "minutes_to_resolve": 91,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:47.091483+00:00",
+    "raw_incident": {
+      "id": "INC-007",
+      "title": "MQTT broker overload detected in device-tracker",
+      "date": "2026-05-24T02:13:00+00:00",
+      "service": "device-tracker",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "MQTT broker queue depth threshold breached in device-tracker. High message dropped rate.",
+      "logs": "[WARN]  2026-05-24 02:13:00 [iot-gateway] mosquitto[1]: Socket error on client <unknown>, disconnecting\n[ERROR] 2026-05-24 02:13:00 [iot-gateway] client connection limit reached: 45000/45000 active connections\n[ERROR] 2026-05-24 02:13:00 [iot-gateway] queue depth breached watermark: 1,240,510 messages queued for subscriber telemetry-worker\n[WARN]  2026-05-24 02:13:00 [iot-gateway] packet dropped: QoS 1 message buffer overflow for topic devices/telemetry\n[ERROR] 2026-05-24 02:13:00 [iot-gateway] socket read timeout after 10000ms from 192.168.1.104:54122\n[FATAL] 2026-05-24 02:13:00 [iot-gateway] mosquitto memory footprint exceeded 8GB: dropping new connection handshakes\n[ERROR] 2026-05-24 02:13:00 [telemetry-receiver] ingestion lag metric: 420 seconds behind real-time\n[WARN]  2026-05-24 02:13:00 [iot-gateway] 12,000 devices retrying connection with 0 backoff jitter",
+      "root_cause": "Broker TCP keepalive timeout was set too high (120s), keeping zombie connections active during cellular outages.",
+      "root_cause_family": "MQTT broker overload",
+      "fix_steps": [
+        "Enable rate-limiting token bucket at edge load balancer to throttle incoming CONNECT packets to 500/sec",
+        "Temporarily change subscriber wildcard topic to specific tenant partitions",
+        "Tune Mosquitto max_queued_messages to 5000 and max_connections to 25000 with connection jitter"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart MQTT broker daemon immediately",
+          "reason": "Restart triggered an instant reconnect storm from 80,000 disconnected devices that locked the network interface."
+        },
+        {
+          "step": "Enable max_inflight_messages = 0 (unlimited)",
+          "reason": "Depleted broker memory within 90 seconds, causing kernel panic."
+        }
+      ],
+      "runbook": "runbooks/mqtt-broker-overload.md",
+      "minutes_to_resolve": 91,
+      "engineer": "Elena Rostova",
+      "post_mortem_lesson": "Enforce client-side reconnect jitter and partition high-throughput telemetry topics away from core control channels.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-008",
+    "title": "DB connection pool exhaustion detected in customer-db-proxy",
+    "service": "customer-db-proxy",
+    "severity": "HIGH",
+    "root_cause": "Slow report aggregation query locked order tables, backing up pgbouncer pool to max limits.",
+    "fix_steps": [
+      "Identify blocking backend PID via pg_stat_activity and execute pg_terminate_backend(pid)",
+      "Temporarily increase pgbouncer default_pool_size from 100 to 250",
+      "Apply hotfix adding statement_timeout = 3000ms on fraud check query"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart all API pods",
+        "reason": "Thundering herd of 400 new pods reconnecting simultaneously caused Postgres CPU to spike to 100% and crashed the primary."
+      },
+      {
+        "step": "Kill all idle transactions indiscriminately",
+        "reason": "Terminated background database replication worker, causing read replica replication lag to spike past 2 hours."
+      }
+    ],
+    "minutes_to_resolve": 58,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:49.626411+00:00",
+    "raw_incident": {
+      "id": "INC-008",
+      "title": "DB connection pool exhaustion detected in customer-db-proxy",
+      "date": "2026-05-27T07:56:00+00:00",
+      "service": "customer-db-proxy",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "Connection pool exhaustion in customer-db-proxy. Upstream 504 Gateway Timeouts surging.",
+      "logs": "[ERROR] 2026-05-27 07:56:00 [payments-api] pool.go:142: pool exhausted: max_connections=200 reached\n[ERROR] 2026-05-27 07:56:00 [payments-api] handler.go:88: db query timeout after 5000ms: context deadline exceeded\n[WARN]  2026-05-27 07:56:00 [payments-api] pgbouncer: server connections saturated (200/200 active, 42 queued)\n[ERROR] 2026-05-27 07:56:00 [payments-api] pgxpool: acquire connection failed: context deadline exceeded\n[ERROR] 2026-05-27 07:56:00 [payments-api] checkout.go:312: failed to commit transaction for order_id=ord_15695: connection closed\n[WARN]  2026-05-27 07:56:00 [payments-api] healthcheck.go:45: database ping exceeded threshold (5120ms > 200ms)\n[FATAL] 2026-05-27 07:56:00 [payments-api] http: panic serving 10.0.4.12:8080: runtime error: invalid memory address in db retry loop\n[ERROR] 2026-05-27 07:56:00 [payments-api] metrics.go:19: error rate threshold breached: 504 Gateway Timeout rate at 24.8%",
+      "root_cause": "Slow report aggregation query locked order tables, backing up pgbouncer pool to max limits.",
+      "root_cause_family": "DB connection pool exhaustion",
+      "fix_steps": [
+        "Identify blocking backend PID via pg_stat_activity and execute pg_terminate_backend(pid)",
+        "Temporarily increase pgbouncer default_pool_size from 100 to 250",
+        "Apply hotfix adding statement_timeout = 3000ms on fraud check query"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart all API pods",
+          "reason": "Thundering herd of 400 new pods reconnecting simultaneously caused Postgres CPU to spike to 100% and crashed the primary."
+        },
+        {
+          "step": "Kill all idle transactions indiscriminately",
+          "reason": "Terminated background database replication worker, causing read replica replication lag to spike past 2 hours."
+        }
+      ],
+      "runbook": "runbooks/database-pool-exhaustion.md",
+      "minutes_to_resolve": 58,
+      "engineer": "Priya Sharma",
+      "post_mortem_lesson": "Never restart application instances during DB pool saturation without capping connection rates in pgbouncer.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-009",
+    "title": "Redis eviction failure detected in cart-cache",
+    "service": "cart-cache",
+    "severity": "CRITICAL",
+    "root_cause": "Cluster policy set to noeviction while cache keys lacked explicit TTLs, causing OOM write rejections.",
+    "fix_steps": [
+      "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary nodes",
+      "Run safe script to UNLINK expired session keys in batches of 500",
+      "Apply patch adding 3600s TTL to all session write calls"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute FLUSHDB across primary nodes",
+        "reason": "Flushing cache caused immediate massive database stampede that knocked over the MySQL replica cluster."
+      },
+      {
+        "step": "Scale Redis replica pods only",
+        "reason": "Replicas only serve read traffic; primary node write operations continued failing with OOM."
+      }
+    ],
+    "minutes_to_resolve": 51,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:52.090366+00:00",
+    "raw_incident": {
+      "id": "INC-009",
+      "title": "Redis eviction failure detected in cart-cache",
+      "date": "2026-05-31T22:02:00+00:00",
+      "service": "cart-cache",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "Redis OOM write command rejected in cart-cache. Memory usage above maxmemory limit.",
+      "logs": "[ERROR] 2026-05-31 22:02:00 [cart-cache] OOM command not allowed when used memory > 'maxmemory' (17179869184 bytes)\n[WARN]  2026-05-31 22:02:00 [cart-cache] maxmemory-policy is 'noeviction', unable to reclaim keys for write\n[ERROR] 2026-05-31 22:02:00 [cart-cache] redis.go:210: write operation 'SETEX cart:usr_89231' rejected by server\n[ERROR] 2026-05-31 22:02:00 [cart-cache] session.go:94: failed to cache user cart state: OOM command not allowed\n[WARN]  2026-05-31 22:02:00 [cart-cache] memory_fragmentation_ratio=2.64, used_memory_rss_human=22.4G\n[ERROR] 2026-05-31 22:02:00 [cart-cache] ratelimit.go:52: token bucket write failed, dropping down to fail-open mode\n[ERROR] 2026-05-31 22:02:00 [cart-cache] client.go:189: command timed out after 2000ms: SET auth_token:998124\n[FATAL] 2026-05-31 22:02:00 [cart-cache] cluster.go:304: 3 shards reporting memory pressure state CRITICAL",
+      "root_cause": "Cluster policy set to noeviction while cache keys lacked explicit TTLs, causing OOM write rejections.",
+      "root_cause_family": "Redis eviction failure",
+      "fix_steps": [
+        "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary nodes",
+        "Run safe script to UNLINK expired session keys in batches of 500",
+        "Apply patch adding 3600s TTL to all session write calls"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute FLUSHDB across primary nodes",
+          "reason": "Flushing cache caused immediate massive database stampede that knocked over the MySQL replica cluster."
+        },
+        {
+          "step": "Scale Redis replica pods only",
+          "reason": "Replicas only serve read traffic; primary node write operations continued failing with OOM."
+        }
+      ],
+      "runbook": "runbooks/redis-memory-alert.md",
+      "minutes_to_resolve": 51,
+      "engineer": "Kenji Sato",
+      "post_mortem_lesson": "Enforce mandatory TTLs in cache client middleware and default all cache clusters to allkeys-lru.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-010",
+    "title": "Expired TLS certificate detected in auth-service",
+    "service": "auth-service",
+    "severity": "HIGH",
+    "root_cause": "Let's Encrypt automated HTTP-01 challenge failed due to Cloudflare rate limiting on challenge token path.",
+    "fix_steps": [
+      "Issue emergency certificate via Cloudflare Origin CA dashboard",
+      "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+      "Perform rolling reload on ingress-router pods to pick up updated secret"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Disable SSL verification on Envoy ingress",
+        "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+      },
+      {
+        "step": "Manually copy certs from staging cluster",
+        "reason": "Staging wildcard cert domain was *.staging.internal, causing host mismatch errors on api.recur.io."
+      }
+    ],
+    "minutes_to_resolve": 64,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:56.149949+00:00",
+    "raw_incident": {
+      "id": "INC-010",
+      "title": "Expired TLS certificate detected in auth-service",
+      "date": "2026-06-03T12:25:00+00:00",
+      "service": "auth-service",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "TLS handshake failure on auth-service ingress. Certificate expired or invalid chain.",
+      "logs": "[ERROR] 2026-06-03 12:25:00 [api-gateway] ssl3_read_bytes: ssl handshake failure: certificate verify failed\n[ERROR] 2026-06-03 12:25:00 [api-gateway] peer closed connection: certificate has expired at 2026-06-14T00:00:00Z\n[WARN]  2026-06-03 12:25:00 [ingress-router] cert-manager.io: order api-ingress-tls failed: 403 Forbidden on .well-known/acme-challenge\n[ERROR] 2026-06-03 12:25:00 [api-gateway] downstream connection error: x509: certificate signed by unknown authority\n[ERROR] 2026-06-03 12:25:00 [api-gateway] envoy[1]: upstream SSL error: 268435581:SSL routines:OPENSSL_internal:CERTIFICATE_VERIFY_FAILED\n[WARN]  2026-06-03 12:25:00 [ingress-router] active cert serial 34:FA:98:12 is expired by 4 hours\n[ERROR] 2026-06-03 12:25:00 [api-gateway] healthcheck failed: 10.0.12.44:443 SSL handshake timeout\n[FATAL] 2026-06-03 12:25:00 [api-gateway] 100% of external HTTPS client requests rejected with TLS Alert 45",
+      "root_cause": "Let's Encrypt automated HTTP-01 challenge failed due to Cloudflare rate limiting on challenge token path.",
+      "root_cause_family": "Expired TLS certificate",
+      "fix_steps": [
+        "Issue emergency certificate via Cloudflare Origin CA dashboard",
+        "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+        "Perform rolling reload on ingress-router pods to pick up updated secret"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Disable SSL verification on Envoy ingress",
+          "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+        },
+        {
+          "step": "Manually copy certs from staging cluster",
+          "reason": "Staging wildcard cert domain was *.staging.internal, causing host mismatch errors on api.recur.io."
+        }
+      ],
+      "runbook": "runbooks/tls-cert-rotation.md",
+      "minutes_to_resolve": 64,
+      "engineer": "Marcus Vance",
+      "post_mortem_lesson": "Add automated 30-day certificate expiry alerting in Prometheus and isolate ACME ingress paths.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-011",
+    "title": "Disk full from log growth detected in ingest-pipeline",
+    "service": "ingest-pipeline",
+    "severity": "HIGH",
+    "root_cause": "Kafka broker segment retention policy was overridden from 24h to infinite on telemetry topic.",
+    "fix_steps": [
+      "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+      "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+      "Execute growpart and resize2fs to extend volume partition",
+      "Verify logrotate cron script executes successfully"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute rm -f /var/log/audit.log while process is active",
+        "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+      },
+      {
+        "step": "Resize EBS volume without extending Linux filesystem",
+        "reason": "AWS volume showed 100GB but ext4 filesystem remained constrained to 20GB, leaving disk full."
+      }
+    ],
+    "minutes_to_resolve": 50,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:58.739487+00:00",
+    "raw_incident": {
+      "id": "INC-011",
+      "title": "Disk full from log growth detected in ingest-pipeline",
+      "date": "2026-06-05T22:19:00+00:00",
+      "service": "ingest-pipeline",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "Disk full alert: /var volume on ingest-pipeline reached 100% capacity.",
+      "logs": "[FATAL] 2026-06-05 22:19:00 [audit-collector] write /var/log/audit/audit.log: no space left on device\n[ERROR] 2026-06-05 22:19:00 [kafka-broker] disk space exhausted on log.dirs=/data/kafka: 0 bytes free (100% utilized)\n[ERROR] 2026-06-05 22:19:00 [audit-collector] logger.go:189: failed to append audit event to disk: ENOSPC\n[WARN]  2026-06-05 22:19:00 [node-exporter] filesystem_free_bytes{mountpoint=\"/var\"} is 0\n[ERROR] 2026-06-05 22:19:00 [kafka-broker] segment.go:88: failed to flush commit log: No space left on device\n[FATAL] 2026-06-05 22:19:00 [kafka-broker] kafka.common.KafkaStorageException: I/O error in append to segment 0000000000049281\n[ERROR] 2026-06-05 22:19:00 [audit-collector] backpressure buffer full: dropping 1500 incoming audit events/sec\n[WARN]  2026-06-05 22:19:00 [systemd] journald: dropped 4920 log messages due to rate limiting and full buffer",
+      "root_cause": "Kafka broker segment retention policy was overridden from 24h to infinite on telemetry topic.",
+      "root_cause_family": "Disk full from log growth",
+      "fix_steps": [
+        "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+        "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+        "Execute growpart and resize2fs to extend volume partition",
+        "Verify logrotate cron script executes successfully"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute rm -f /var/log/audit.log while process is active",
+          "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+        },
+        {
+          "step": "Resize EBS volume without extending Linux filesystem",
+          "reason": "AWS volume showed 100GB but ext4 filesystem remained constrained to 20GB, leaving disk full."
+        }
+      ],
+      "runbook": "runbooks/disk-space-recovery.md",
+      "minutes_to_resolve": 50,
+      "engineer": "Elena Rostova",
+      "post_mortem_lesson": "Never delete active open logs with rm; use truncate and enforce disk watermarks at 80%.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-012",
+    "title": "Bad config deploy detected in shipping-calc",
+    "service": "shipping-calc",
+    "severity": "HIGH",
+    "root_cause": "Environment variable TIMEOUT_MS was deployed as '500' string instead of integer, causing crash loop.",
+    "fix_steps": [
+      "Execute helm rollback checkout-web-prod to previous stable release revision",
+      "Verify pods transition back to Running state and healthcheck 200 OK",
+      "Correct Helm value template and validate with helm template --validate before future deploys"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+        "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+      },
+      {
+        "step": "Roll forward with untested bugfix commit",
+        "reason": "Compounded the outage with a secondary syntax error in the deployment template."
+      }
+    ],
+    "minutes_to_resolve": 45,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:01.144336+00:00",
+    "raw_incident": {
+      "id": "INC-012",
+      "title": "Bad config deploy detected in shipping-calc",
+      "date": "2026-06-10T11:28:00+00:00",
+      "service": "shipping-calc",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "CrashLoopBackOff in shipping-calc following release deployment. Malformed configuration.",
+      "logs": "[FATAL] 2026-06-10 11:28:00 [checkout-web] config.go:42: missing required environment variable: STRIPE_SECRET_KEY\n[ERROR] 2026-06-10 11:28:00 [checkout-web] main.go:89: initialization failed: unable to construct payment provider client\n[FATAL] 2026-06-10 11:28:00 [checkout-web] panic: runtime error: invalid memory address or nil pointer dereference\n[ERROR] 2026-06-10 11:28:00 [checkout-web] kubelet: Readiness probe failed: Get \"http://10.0.2.14:8080/healthz\": dial tcp: connection refused\n[WARN]  2026-06-10 11:28:00 [checkout-web] pod checkout-web-7b98d4f4f-zk92l entered CrashLoopBackOff (exit code 2)\n[ERROR] 2026-06-10 11:28:00 [checkout-web] 0/6 replicas available in deployment/checkout-web\n[ERROR] 2026-06-10 11:28:00 [checkout-web] ingress returning 503 Service Unavailable for /v1/checkout\n[WARN]  2026-06-10 11:28:00 [checkout-web] helm release version 4.12.0 status: FAILED_POST_INSTALL",
+      "root_cause": "Environment variable TIMEOUT_MS was deployed as '500' string instead of integer, causing crash loop.",
+      "root_cause_family": "Bad config deploy",
+      "fix_steps": [
+        "Execute helm rollback checkout-web-prod to previous stable release revision",
+        "Verify pods transition back to Running state and healthcheck 200 OK",
+        "Correct Helm value template and validate with helm template --validate before future deploys"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+          "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+        },
+        {
+          "step": "Roll forward with untested bugfix commit",
+          "reason": "Compounded the outage with a secondary syntax error in the deployment template."
+        }
+      ],
+      "runbook": "runbooks/config-rollback.md",
+      "minutes_to_resolve": 45,
+      "engineer": "Sarah Chen",
+      "post_mortem_lesson": "Always run helm rollback immediately when a config rollout fails healthchecks rather than hot-fixing in prod.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-013",
+    "title": "Service memory leak detected in recommendation-engine",
+    "service": "recommendation-engine",
+    "severity": "HIGH",
+    "root_cause": "Goroutine leak in websocket connection heartbeat handler failed to terminate disconnected client channels.",
+    "fix_steps": [
+      "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+      "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+      "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+        "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+      },
+      {
+        "step": "Disable Kubernetes liveness probe",
+        "reason": "Pod hung indefinitely in thrashing swap memory state, refusing traffic while failing to restart."
+      }
+    ],
+    "minutes_to_resolve": 55,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:03.627020+00:00",
+    "raw_incident": {
+      "id": "INC-013",
+      "title": "Service memory leak detected in recommendation-engine",
+      "date": "2026-06-15T01:08:00+00:00",
+      "service": "recommendation-engine",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "OOMKilled container restart loop in recommendation-engine. Memory allocation rate abnormal.",
+      "logs": "[WARN]  2026-06-15 01:08:00 [websocket-hub] container memory usage reached 94.2% of limit (3.78Gi / 4.0Gi)\n[ERROR] 2026-06-15 01:08:00 [websocket-hub] go_memstats_alloc_bytes: continuous growth from 400MB to 3.8GB in 45m\n[FATAL] 2026-06-15 01:08:00 [websocket-hub] kernel: [89124.912] oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,task=websocket-hub\n[ERROR] 2026-06-15 01:08:00 [websocket-hub] kubelet: Container websocket-hub in pod websocket-hub-84b2c-29m1 was OOMKilled (exit code 137)\n[WARN]  2026-06-15 01:08:00 [websocket-hub] 14,000 active client connections abruptly terminated\n[ERROR] 2026-06-15 01:08:00 [websocket-hub] pprof: heap profile indicates 2,400,000 active goroutines blocked in channel write\n[WARN]  2026-06-15 01:08:00 [websocket-hub] client reconnect wave causing CPU spike to 95% on replacement pod\n[FATAL] 2026-06-15 01:08:00 [websocket-hub] replacement pod also reaching 80% memory limit within 15 minutes",
+      "root_cause": "Goroutine leak in websocket connection heartbeat handler failed to terminate disconnected client channels.",
+      "root_cause_family": "Service memory leak",
+      "fix_steps": [
+        "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+        "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+        "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+          "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+        },
+        {
+          "step": "Disable Kubernetes liveness probe",
+          "reason": "Pod hung indefinitely in thrashing swap memory state, refusing traffic while failing to restart."
+        }
+      ],
+      "runbook": "runbooks/oom-killed-service.md",
+      "minutes_to_resolve": 55,
+      "engineer": "Kenji Sato",
+      "post_mortem_lesson": "Profile heap usage during staging load tests and never remove goroutine context cancellation hooks.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-014",
+    "title": "MQTT broker overload detected in telemetry-receiver",
+    "service": "telemetry-receiver",
+    "severity": "HIGH",
+    "root_cause": "Wildcard MQTT subscription 'devices/+/telemetry/#' caused message queue depth to surge beyond 1M messages.",
+    "fix_steps": [
+      "Enable rate-limiting token bucket at edge load balancer to throttle incoming CONNECT packets to 500/sec",
+      "Temporarily change subscriber wildcard topic to specific tenant partitions",
+      "Tune Mosquitto max_queued_messages to 5000 and max_connections to 25000 with connection jitter"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart MQTT broker daemon immediately",
+        "reason": "Restart triggered an instant reconnect storm from 80,000 disconnected devices that locked the network interface."
+      },
+      {
+        "step": "Enable max_inflight_messages = 0 (unlimited)",
+        "reason": "Depleted broker memory within 90 seconds, causing kernel panic."
+      }
+    ],
+    "minutes_to_resolve": 52,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:07.334452+00:00",
+    "raw_incident": {
+      "id": "INC-014",
+      "title": "MQTT broker overload detected in telemetry-receiver",
+      "date": "2026-06-16T02:02:00+00:00",
+      "service": "telemetry-receiver",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "MQTT broker queue depth threshold breached in telemetry-receiver. High message dropped rate.",
+      "logs": "[WARN]  2026-06-16 02:02:00 [iot-gateway] mosquitto[1]: Socket error on client <unknown>, disconnecting\n[ERROR] 2026-06-16 02:02:00 [iot-gateway] client connection limit reached: 45000/45000 active connections\n[ERROR] 2026-06-16 02:02:00 [iot-gateway] queue depth breached watermark: 1,240,510 messages queued for subscriber telemetry-worker\n[WARN]  2026-06-16 02:02:00 [iot-gateway] packet dropped: QoS 1 message buffer overflow for topic devices/telemetry\n[ERROR] 2026-06-16 02:02:00 [iot-gateway] socket read timeout after 10000ms from 192.168.1.104:54122\n[FATAL] 2026-06-16 02:02:00 [iot-gateway] mosquitto memory footprint exceeded 8GB: dropping new connection handshakes\n[ERROR] 2026-06-16 02:02:00 [telemetry-receiver] ingestion lag metric: 420 seconds behind real-time\n[WARN]  2026-06-16 02:02:00 [iot-gateway] 12,000 devices retrying connection with 0 backoff jitter",
+      "root_cause": "Wildcard MQTT subscription 'devices/+/telemetry/#' caused message queue depth to surge beyond 1M messages.",
+      "root_cause_family": "MQTT broker overload",
+      "fix_steps": [
+        "Enable rate-limiting token bucket at edge load balancer to throttle incoming CONNECT packets to 500/sec",
+        "Temporarily change subscriber wildcard topic to specific tenant partitions",
+        "Tune Mosquitto max_queued_messages to 5000 and max_connections to 25000 with connection jitter"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart MQTT broker daemon immediately",
+          "reason": "Restart triggered an instant reconnect storm from 80,000 disconnected devices that locked the network interface."
+        },
+        {
+          "step": "Enable max_inflight_messages = 0 (unlimited)",
+          "reason": "Depleted broker memory within 90 seconds, causing kernel panic."
+        }
+      ],
+      "runbook": "runbooks/mqtt-broker-overload.md",
+      "minutes_to_resolve": 52,
+      "engineer": "Priya Sharma",
+      "post_mortem_lesson": "Enforce client-side reconnect jitter and partition high-throughput telemetry topics away from core control channels.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-015",
+    "title": "DB connection pool exhaustion detected in billing-worker",
+    "service": "billing-worker",
+    "severity": "HIGH",
+    "root_cause": "Connection leak in connection pooler acquire timeout handler during network latency blip.",
+    "fix_steps": [
+      "Identify blocking backend PID via pg_stat_activity and execute pg_terminate_backend(pid)",
+      "Temporarily increase pgbouncer default_pool_size from 100 to 250",
+      "Apply hotfix adding statement_timeout = 3000ms on fraud check query"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart all API pods",
+        "reason": "Thundering herd of 400 new pods reconnecting simultaneously caused Postgres CPU to spike to 100% and crashed the primary."
+      }
+    ],
+    "minutes_to_resolve": 29,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:17.802484+00:00",
+    "raw_incident": {
+      "id": "INC-015",
+      "title": "DB connection pool exhaustion detected in billing-worker",
+      "date": "2026-06-20T23:03:00+00:00",
+      "service": "billing-worker",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "Connection pool exhaustion in billing-worker. Upstream 504 Gateway Timeouts surging.",
+      "logs": "[ERROR] 2026-06-20 23:03:00 [payments-api] pool.go:142: pool exhausted: max_connections=200 reached\n[ERROR] 2026-06-20 23:03:00 [payments-api] handler.go:88: db query timeout after 5000ms: context deadline exceeded\n[WARN]  2026-06-20 23:03:00 [payments-api] pgbouncer: server connections saturated (200/200 active, 42 queued)\n[ERROR] 2026-06-20 23:03:00 [payments-api] pgxpool: acquire connection failed: context deadline exceeded\n[ERROR] 2026-06-20 23:03:00 [payments-api] checkout.go:312: failed to commit transaction for order_id=ord_99733: connection closed\n[WARN]  2026-06-20 23:03:00 [payments-api] healthcheck.go:45: database ping exceeded threshold (5120ms > 200ms)\n[FATAL] 2026-06-20 23:03:00 [payments-api] http: panic serving 10.0.4.12:8080: runtime error: invalid memory address in db retry loop\n[ERROR] 2026-06-20 23:03:00 [payments-api] metrics.go:19: error rate threshold breached: 504 Gateway Timeout rate at 24.8%",
+      "root_cause": "Connection leak in connection pooler acquire timeout handler during network latency blip.",
+      "root_cause_family": "DB connection pool exhaustion",
+      "fix_steps": [
+        "Identify blocking backend PID via pg_stat_activity and execute pg_terminate_backend(pid)",
+        "Temporarily increase pgbouncer default_pool_size from 100 to 250",
+        "Apply hotfix adding statement_timeout = 3000ms on fraud check query"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart all API pods",
+          "reason": "Thundering herd of 400 new pods reconnecting simultaneously caused Postgres CPU to spike to 100% and crashed the primary."
+        }
+      ],
+      "runbook": "runbooks/database-pool-exhaustion.md",
+      "minutes_to_resolve": 29,
+      "engineer": "Sarah Chen",
+      "post_mortem_lesson": "Never restart application instances during DB pool saturation without capping connection rates in pgbouncer.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-003",
+    "title": "Expired TLS certificate detected in ingress-router",
+    "service": "ingress-router",
+    "severity": "CRITICAL",
+    "root_cause": "Internal mTLS root CA expired after 365 days; cert renewal cron job lacked RBAC cluster secret permissions.",
+    "fix_steps": [
+      "Issue emergency certificate via Cloudflare Origin CA dashboard",
+      "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+      "Perform rolling reload on ingress-router pods to pick up updated secret"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Disable SSL verification on Envoy ingress",
+        "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+      },
+      {
+        "step": "Manually copy certs from staging cluster",
+        "reason": "Staging wildcard cert domain was *.staging.internal, causing host mismatch errors on api.recur.io."
+      }
+    ],
+    "minutes_to_resolve": 93,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:33.780059+00:00",
+    "raw_incident": {
+      "id": "INC-003",
+      "title": "Expired TLS certificate detected in ingress-router",
+      "date": "2026-05-11T10:06:00+00:00",
+      "service": "ingress-router",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "TLS handshake failure on ingress-router ingress. Certificate expired or invalid chain.",
+      "logs": "[ERROR] 2026-05-11 10:06:00 [api-gateway] ssl3_read_bytes: ssl handshake failure: certificate verify failed\n[ERROR] 2026-05-11 10:06:00 [api-gateway] peer closed connection: certificate has expired at 2026-06-14T00:00:00Z\n[WARN]  2026-05-11 10:06:00 [ingress-router] cert-manager.io: order api-ingress-tls failed: 403 Forbidden on .well-known/acme-challenge\n[ERROR] 2026-05-11 10:06:00 [api-gateway] downstream connection error: x509: certificate signed by unknown authority\n[ERROR] 2026-05-11 10:06:00 [api-gateway] envoy[1]: upstream SSL error: 268435581:SSL routines:OPENSSL_internal:CERTIFICATE_VERIFY_FAILED\n[WARN]  2026-05-11 10:06:00 [ingress-router] active cert serial 34:FA:98:12 is expired by 4 hours\n[ERROR] 2026-05-11 10:06:00 [api-gateway] healthcheck failed: 10.0.12.44:443 SSL handshake timeout\n[FATAL] 2026-05-11 10:06:00 [api-gateway] 100% of external HTTPS client requests rejected with TLS Alert 45",
+      "root_cause": "Internal mTLS root CA expired after 365 days; cert renewal cron job lacked RBAC cluster secret permissions.",
+      "root_cause_family": "Expired TLS certificate",
+      "fix_steps": [
+        "Issue emergency certificate via Cloudflare Origin CA dashboard",
+        "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+        "Perform rolling reload on ingress-router pods to pick up updated secret"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Disable SSL verification on Envoy ingress",
+          "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+        },
+        {
+          "step": "Manually copy certs from staging cluster",
+          "reason": "Staging wildcard cert domain was *.staging.internal, causing host mismatch errors on api.recur.io."
+        }
+      ],
+      "runbook": "runbooks/tls-cert-rotation.md",
+      "minutes_to_resolve": 93,
+      "engineer": "Aisha Al-Mansoor",
+      "post_mortem_lesson": "Add automated 30-day certificate expiry alerting in Prometheus and isolate ACME ingress paths.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-005",
+    "title": "Bad config deploy detected in checkout-web",
+    "service": "checkout-web",
+    "severity": "MEDIUM",
+    "root_cause": "Helm chart release referenced internal vault secret key DB_PASSWORD_V2 which was not yet populated.",
+    "fix_steps": [
+      "Execute helm rollback checkout-web-prod to previous stable release revision",
+      "Verify pods transition back to Running state and healthcheck 200 OK",
+      "Correct Helm value template and validate with helm template --validate before future deploys"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+        "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+      },
+      {
+        "step": "Roll forward with untested bugfix commit",
+        "reason": "Compounded the outage with a secondary syntax error in the deployment template."
+      }
+    ],
+    "minutes_to_resolve": 75,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:04:42.898930+00:00",
+    "raw_incident": {
+      "id": "INC-005",
+      "title": "Bad config deploy detected in checkout-web",
+      "date": "2026-05-17T00:50:00+00:00",
+      "service": "checkout-web",
+      "severity": "MEDIUM",
+      "status": "RESOLVED",
+      "alert": "CrashLoopBackOff in checkout-web following release deployment. Malformed configuration.",
+      "logs": "[FATAL] 2026-05-17 00:50:00 [checkout-web] config.go:42: missing required environment variable: STRIPE_SECRET_KEY\n[ERROR] 2026-05-17 00:50:00 [checkout-web] main.go:89: initialization failed: unable to construct payment provider client\n[FATAL] 2026-05-17 00:50:00 [checkout-web] panic: runtime error: invalid memory address or nil pointer dereference\n[ERROR] 2026-05-17 00:50:00 [checkout-web] kubelet: Readiness probe failed: Get \"http://10.0.2.14:8080/healthz\": dial tcp: connection refused\n[WARN]  2026-05-17 00:50:00 [checkout-web] pod checkout-web-7b98d4f4f-zk92l entered CrashLoopBackOff (exit code 2)\n[ERROR] 2026-05-17 00:50:00 [checkout-web] 0/6 replicas available in deployment/checkout-web\n[ERROR] 2026-05-17 00:50:00 [checkout-web] ingress returning 503 Service Unavailable for /v1/checkout\n[WARN]  2026-05-17 00:50:00 [checkout-web] helm release version 4.12.0 status: FAILED_POST_INSTALL",
+      "root_cause": "Helm chart release referenced internal vault secret key DB_PASSWORD_V2 which was not yet populated.",
+      "root_cause_family": "Bad config deploy",
+      "fix_steps": [
+        "Execute helm rollback checkout-web-prod to previous stable release revision",
+        "Verify pods transition back to Running state and healthcheck 200 OK",
+        "Correct Helm value template and validate with helm template --validate before future deploys"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+          "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+        },
+        {
+          "step": "Roll forward with untested bugfix commit",
+          "reason": "Compounded the outage with a secondary syntax error in the deployment template."
+        }
+      ],
+      "runbook": "runbooks/config-rollback.md",
+      "minutes_to_resolve": 75,
+      "engineer": "Devon Park",
+      "post_mortem_lesson": "Always run helm rollback immediately when a config rollout fails healthchecks rather than hot-fixing in prod.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-016",
+    "title": "Redis eviction failure detected in auth-token-cache",
+    "service": "auth-token-cache",
+    "severity": "HIGH",
+    "root_cause": "Cart serializer cache stampede filled 16GB RAM with duplicated uncompressed session payloads.",
+    "fix_steps": [
+      "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary nodes",
+      "Run safe script to UNLINK expired session keys in batches of 500",
+      "Apply patch adding 3600s TTL to all session write calls"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute FLUSHDB across primary nodes",
+        "reason": "Flushing cache caused immediate massive database stampede that knocked over the MySQL replica cluster."
+      }
+    ],
+    "minutes_to_resolve": 20,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:19.423215+00:00",
+    "raw_incident": {
+      "id": "INC-016",
+      "title": "Redis eviction failure detected in auth-token-cache",
+      "date": "2026-06-25T22:54:00+00:00",
+      "service": "auth-token-cache",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "Redis OOM write command rejected in auth-token-cache. Memory usage above maxmemory limit.",
+      "logs": "[ERROR] 2026-06-25 22:54:00 [cart-cache] OOM command not allowed when used memory > 'maxmemory' (17179869184 bytes)\n[WARN]  2026-06-25 22:54:00 [cart-cache] maxmemory-policy is 'noeviction', unable to reclaim keys for write\n[ERROR] 2026-06-25 22:54:00 [cart-cache] redis.go:210: write operation 'SETEX cart:usr_89231' rejected by server\n[ERROR] 2026-06-25 22:54:00 [cart-cache] session.go:94: failed to cache user cart state: OOM command not allowed\n[WARN]  2026-06-25 22:54:00 [cart-cache] memory_fragmentation_ratio=2.64, used_memory_rss_human=22.4G\n[ERROR] 2026-06-25 22:54:00 [cart-cache] ratelimit.go:52: token bucket write failed, dropping down to fail-open mode\n[ERROR] 2026-06-25 22:54:00 [cart-cache] client.go:189: command timed out after 2000ms: SET auth_token:998124\n[FATAL] 2026-06-25 22:54:00 [cart-cache] cluster.go:304: 3 shards reporting memory pressure state CRITICAL",
+      "root_cause": "Cart serializer cache stampede filled 16GB RAM with duplicated uncompressed session payloads.",
+      "root_cause_family": "Redis eviction failure",
+      "fix_steps": [
+        "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary nodes",
+        "Run safe script to UNLINK expired session keys in batches of 500",
+        "Apply patch adding 3600s TTL to all session write calls"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute FLUSHDB across primary nodes",
+          "reason": "Flushing cache caused immediate massive database stampede that knocked over the MySQL replica cluster."
+        }
+      ],
+      "runbook": "runbooks/redis-memory-alert.md",
+      "minutes_to_resolve": 20,
+      "engineer": "Carlos Mendez",
+      "post_mortem_lesson": "Enforce mandatory TTLs in cache client middleware and default all cache clusters to allkeys-lru.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-017",
+    "title": "Expired TLS certificate detected in api-gateway",
+    "service": "api-gateway",
+    "severity": "CRITICAL",
+    "root_cause": "cert-manager ACME challenge ingress rule was shadowed by a newly deployed URL rewrite rule.",
+    "fix_steps": [
+      "Issue emergency certificate via Cloudflare Origin CA dashboard",
+      "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+      "Perform rolling reload on ingress-router pods to pick up updated secret"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Disable SSL verification on Envoy ingress",
+        "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+      },
+      {
+        "step": "Manually copy certs from staging cluster",
+        "reason": "Staging wildcard cert domain was *.staging.internal, causing host mismatch errors on api.recur.io."
+      }
+    ],
+    "minutes_to_resolve": 31,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:25.494462+00:00",
+    "raw_incident": {
+      "id": "INC-017",
+      "title": "Expired TLS certificate detected in api-gateway",
+      "date": "2026-07-01T06:59:00+00:00",
+      "service": "api-gateway",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "TLS handshake failure on api-gateway ingress. Certificate expired or invalid chain.",
+      "logs": "[ERROR] 2026-07-01 06:59:00 [api-gateway] ssl3_read_bytes: ssl handshake failure: certificate verify failed\n[ERROR] 2026-07-01 06:59:00 [api-gateway] peer closed connection: certificate has expired at 2026-06-14T00:00:00Z\n[WARN]  2026-07-01 06:59:00 [ingress-router] cert-manager.io: order api-ingress-tls failed: 403 Forbidden on .well-known/acme-challenge\n[ERROR] 2026-07-01 06:59:00 [api-gateway] downstream connection error: x509: certificate signed by unknown authority\n[ERROR] 2026-07-01 06:59:00 [api-gateway] envoy[1]: upstream SSL error: 268435581:SSL routines:OPENSSL_internal:CERTIFICATE_VERIFY_FAILED\n[WARN]  2026-07-01 06:59:00 [ingress-router] active cert serial 34:FA:98:12 is expired by 4 hours\n[ERROR] 2026-07-01 06:59:00 [api-gateway] healthcheck failed: 10.0.12.44:443 SSL handshake timeout\n[FATAL] 2026-07-01 06:59:00 [api-gateway] 100% of external HTTPS client requests rejected with TLS Alert 45",
+      "root_cause": "cert-manager ACME challenge ingress rule was shadowed by a newly deployed URL rewrite rule.",
+      "root_cause_family": "Expired TLS certificate",
+      "fix_steps": [
+        "Issue emergency certificate via Cloudflare Origin CA dashboard",
+        "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+        "Perform rolling reload on ingress-router pods to pick up updated secret"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Disable SSL verification on Envoy ingress",
+          "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+        },
+        {
+          "step": "Manually copy certs from staging cluster",
+          "reason": "Staging wildcard cert domain was *.staging.internal, causing host mismatch errors on api.recur.io."
+        }
+      ],
+      "runbook": "runbooks/tls-cert-rotation.md",
+      "minutes_to_resolve": 31,
+      "engineer": "Sarah Chen",
+      "post_mortem_lesson": "Add automated 30-day certificate expiry alerting in Prometheus and isolate ACME ingress paths.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-018",
+    "title": "Disk full from log growth detected in kafka-broker",
+    "service": "kafka-broker",
+    "severity": "MEDIUM",
+    "root_cause": "Logrotate daemon failed to execute due to wrong file ownership permissions in /var/log/recur.",
+    "fix_steps": [
+      "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+      "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+      "Execute growpart and resize2fs to extend volume partition",
+      "Verify logrotate cron script executes successfully"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute rm -f /var/log/audit.log while process is active",
+        "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+      }
+    ],
+    "minutes_to_resolve": 24,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:05:28.052762+00:00",
+    "raw_incident": {
+      "id": "INC-018",
+      "title": "Disk full from log growth detected in kafka-broker",
+      "date": "2026-07-06T05:05:00+00:00",
+      "service": "kafka-broker",
+      "severity": "MEDIUM",
+      "status": "RESOLVED",
+      "alert": "Disk full alert: /var volume on kafka-broker reached 100% capacity.",
+      "logs": "[FATAL] 2026-07-06 05:05:00 [audit-collector] write /var/log/audit/audit.log: no space left on device\n[ERROR] 2026-07-06 05:05:00 [kafka-broker] disk space exhausted on log.dirs=/data/kafka: 0 bytes free (100% utilized)\n[ERROR] 2026-07-06 05:05:00 [audit-collector] logger.go:189: failed to append audit event to disk: ENOSPC\n[WARN]  2026-07-06 05:05:00 [node-exporter] filesystem_free_bytes{mountpoint=\"/var\"} is 0\n[ERROR] 2026-07-06 05:05:00 [kafka-broker] segment.go:88: failed to flush commit log: No space left on device\n[FATAL] 2026-07-06 05:05:00 [kafka-broker] kafka.common.KafkaStorageException: I/O error in append to segment 0000000000049281\n[ERROR] 2026-07-06 05:05:00 [audit-collector] backpressure buffer full: dropping 1500 incoming audit events/sec\n[WARN]  2026-07-06 05:05:00 [systemd] journald: dropped 4920 log messages due to rate limiting and full buffer",
+      "root_cause": "Logrotate daemon failed to execute due to wrong file ownership permissions in /var/log/recur.",
+      "root_cause_family": "Disk full from log growth",
+      "fix_steps": [
+        "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+        "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+        "Execute growpart and resize2fs to extend volume partition",
+        "Verify logrotate cron script executes successfully"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute rm -f /var/log/audit.log while process is active",
+          "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+        }
+      ],
+      "runbook": "runbooks/disk-space-recovery.md",
+      "minutes_to_resolve": 24,
+      "engineer": "Priya Sharma",
+      "post_mortem_lesson": "Never delete active open logs with rm; use truncate and enforce disk watermarks at 80%.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-021",
+    "title": "MQTT broker overload detected in iot-gateway",
+    "service": "iot-gateway",
+    "severity": "MEDIUM",
+    "root_cause": "Smart device firmware update rollout caused 50,000 IoT sensors to reconnect simultaneously with QoS 2.",
+    "fix_steps": [
+      "Enable rate-limiting token bucket at edge load balancer to throttle incoming CONNECT packets to 500/sec",
+      "Temporarily change subscriber wildcard topic to specific tenant partitions",
+      "Tune Mosquitto max_queued_messages to 5000 and max_connections to 25000 with connection jitter"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart MQTT broker daemon immediately",
+        "reason": "Restart triggered an instant reconnect storm from 80,000 disconnected devices that locked the network interface."
+      }
+    ],
+    "minutes_to_resolve": 23,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:07:29.206262+00:00",
+    "raw_incident": {
+      "id": "INC-021",
+      "title": "MQTT broker overload detected in iot-gateway",
+      "date": "2026-07-16T02:10:00+00:00",
+      "service": "iot-gateway",
+      "severity": "MEDIUM",
+      "status": "RESOLVED",
+      "alert": "MQTT broker queue depth threshold breached in iot-gateway. High message dropped rate.",
+      "logs": "[WARN]  2026-07-16 02:10:00 [iot-gateway] mosquitto[1]: Socket error on client <unknown>, disconnecting\n[ERROR] 2026-07-16 02:10:00 [iot-gateway] client connection limit reached: 45000/45000 active connections\n[ERROR] 2026-07-16 02:10:00 [iot-gateway] queue depth breached watermark: 1,240,510 messages queued for subscriber telemetry-worker\n[WARN]  2026-07-16 02:10:00 [iot-gateway] packet dropped: QoS 1 message buffer overflow for topic devices/telemetry\n[ERROR] 2026-07-16 02:10:00 [iot-gateway] socket read timeout after 10000ms from 192.168.1.104:54122\n[FATAL] 2026-07-16 02:10:00 [iot-gateway] mosquitto memory footprint exceeded 8GB: dropping new connection handshakes\n[ERROR] 2026-07-16 02:10:00 [telemetry-receiver] ingestion lag metric: 420 seconds behind real-time\n[WARN]  2026-07-16 02:10:00 [iot-gateway] 12,000 devices retrying connection with 0 backoff jitter",
+      "root_cause": "Smart device firmware update rollout caused 50,000 IoT sensors to reconnect simultaneously with QoS 2.",
+      "root_cause_family": "MQTT broker overload",
+      "fix_steps": [
+        "Enable rate-limiting token bucket at edge load balancer to throttle incoming CONNECT packets to 500/sec",
+        "Temporarily change subscriber wildcard topic to specific tenant partitions",
+        "Tune Mosquitto max_queued_messages to 5000 and max_connections to 25000 with connection jitter"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart MQTT broker daemon immediately",
+          "reason": "Restart triggered an instant reconnect storm from 80,000 disconnected devices that locked the network interface."
+        }
+      ],
+      "runbook": "runbooks/mqtt-broker-overload.md",
+      "minutes_to_resolve": 23,
+      "engineer": "Elena Rostova",
+      "post_mortem_lesson": "Enforce client-side reconnect jitter and partition high-throughput telemetry topics away from core control channels.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-022",
+    "title": "DB connection pool exhaustion detected in checkout-service",
+    "service": "checkout-service",
+    "severity": "HIGH",
+    "root_cause": "Prepared statement leaks in billing worker exhausted max_connections under traffic spike.",
+    "fix_steps": [
+      "Identify blocking backend PID via pg_stat_activity and execute pg_terminate_backend(pid)",
+      "Temporarily increase pgbouncer default_pool_size from 100 to 250",
+      "Apply hotfix adding statement_timeout = 3000ms on fraud check query"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart all API pods",
+        "reason": "Thundering herd of 400 new pods reconnecting simultaneously caused Postgres CPU to spike to 100% and crashed the primary."
+      }
+    ],
+    "minutes_to_resolve": 13,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:07:31.041824+00:00",
+    "raw_incident": {
+      "id": "INC-022",
+      "title": "DB connection pool exhaustion detected in checkout-service",
+      "date": "2026-07-18T02:17:00+00:00",
+      "service": "checkout-service",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "Connection pool exhaustion in checkout-service. Upstream 504 Gateway Timeouts surging.",
+      "logs": "[ERROR] 2026-07-18 02:17:00 [payments-api] pool.go:142: pool exhausted: max_connections=200 reached\n[ERROR] 2026-07-18 02:17:00 [payments-api] handler.go:88: db query timeout after 5000ms: context deadline exceeded\n[WARN]  2026-07-18 02:17:00 [payments-api] pgbouncer: server connections saturated (200/200 active, 42 queued)\n[ERROR] 2026-07-18 02:17:00 [payments-api] pgxpool: acquire connection failed: context deadline exceeded\n[ERROR] 2026-07-18 02:17:00 [payments-api] checkout.go:312: failed to commit transaction for order_id=ord_88172: connection closed\n[WARN]  2026-07-18 02:17:00 [payments-api] healthcheck.go:45: database ping exceeded threshold (5120ms > 200ms)\n[FATAL] 2026-07-18 02:17:00 [payments-api] http: panic serving 10.0.4.12:8080: runtime error: invalid memory address in db retry loop\n[ERROR] 2026-07-18 02:17:00 [payments-api] metrics.go:19: error rate threshold breached: 504 Gateway Timeout rate at 24.8%",
+      "root_cause": "Prepared statement leaks in billing worker exhausted max_connections under traffic spike.",
+      "root_cause_family": "DB connection pool exhaustion",
+      "fix_steps": [
+        "Identify blocking backend PID via pg_stat_activity and execute pg_terminate_backend(pid)",
+        "Temporarily increase pgbouncer default_pool_size from 100 to 250",
+        "Apply hotfix adding statement_timeout = 3000ms on fraud check query"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart all API pods",
+          "reason": "Thundering herd of 400 new pods reconnecting simultaneously caused Postgres CPU to spike to 100% and crashed the primary."
+        }
+      ],
+      "runbook": "runbooks/database-pool-exhaustion.md",
+      "minutes_to_resolve": 13,
+      "engineer": "Elena Rostova",
+      "post_mortem_lesson": "Never restart application instances during DB pool saturation without capping connection rates in pgbouncer.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-023",
+    "title": "Redis eviction failure detected in rate-limiter",
+    "service": "rate-limiter",
+    "severity": "MEDIUM",
+    "root_cause": "Redis cluster memory fragmentation ratio hit 2.8, triggering maxmemory cap prematurely.",
+    "fix_steps": [
+      "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary nodes",
+      "Run safe script to UNLINK expired session keys in batches of 500",
+      "Apply patch adding 3600s TTL to all session write calls"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute FLUSHDB across primary nodes",
+        "reason": "Flushing cache caused immediate massive database stampede that knocked over the MySQL replica cluster."
+      }
+    ],
+    "minutes_to_resolve": 12,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:07:33.465747+00:00",
+    "raw_incident": {
+      "id": "INC-023",
+      "title": "Redis eviction failure detected in rate-limiter",
+      "date": "2026-07-20T21:59:00+00:00",
+      "service": "rate-limiter",
+      "severity": "MEDIUM",
+      "status": "RESOLVED",
+      "alert": "Redis OOM write command rejected in rate-limiter. Memory usage above maxmemory limit.",
+      "logs": "[ERROR] 2026-07-20 21:59:00 [cart-cache] OOM command not allowed when used memory > 'maxmemory' (17179869184 bytes)\n[WARN]  2026-07-20 21:59:00 [cart-cache] maxmemory-policy is 'noeviction', unable to reclaim keys for write\n[ERROR] 2026-07-20 21:59:00 [cart-cache] redis.go:210: write operation 'SETEX cart:usr_89231' rejected by server\n[ERROR] 2026-07-20 21:59:00 [cart-cache] session.go:94: failed to cache user cart state: OOM command not allowed\n[WARN]  2026-07-20 21:59:00 [cart-cache] memory_fragmentation_ratio=2.64, used_memory_rss_human=22.4G\n[ERROR] 2026-07-20 21:59:00 [cart-cache] ratelimit.go:52: token bucket write failed, dropping down to fail-open mode\n[ERROR] 2026-07-20 21:59:00 [cart-cache] client.go:189: command timed out after 2000ms: SET auth_token:998124\n[FATAL] 2026-07-20 21:59:00 [cart-cache] cluster.go:304: 3 shards reporting memory pressure state CRITICAL",
+      "root_cause": "Redis cluster memory fragmentation ratio hit 2.8, triggering maxmemory cap prematurely.",
+      "root_cause_family": "Redis eviction failure",
+      "fix_steps": [
+        "Execute CONFIG SET maxmemory-policy allkeys-lru on Redis primary nodes",
+        "Run safe script to UNLINK expired session keys in batches of 500",
+        "Apply patch adding 3600s TTL to all session write calls"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute FLUSHDB across primary nodes",
+          "reason": "Flushing cache caused immediate massive database stampede that knocked over the MySQL replica cluster."
+        }
+      ],
+      "runbook": "runbooks/redis-memory-alert.md",
+      "minutes_to_resolve": 12,
+      "engineer": "Kenji Sato",
+      "post_mortem_lesson": "Enforce mandatory TTLs in cache client middleware and default all cache clusters to allkeys-lru.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-024",
+    "title": "Expired TLS certificate detected in partner-webhook-gateway",
+    "service": "partner-webhook-gateway",
+    "severity": "CRITICAL",
+    "root_cause": "Intermediate certificate chain was omitted from renewed secret, causing strict client handshake failures.",
+    "fix_steps": [
+      "Issue emergency certificate via Cloudflare Origin CA dashboard",
+      "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+      "Perform rolling reload on ingress-router pods to pick up updated secret"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Disable SSL verification on Envoy ingress",
+        "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+      }
+    ],
+    "minutes_to_resolve": 15,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:07:40.384894+00:00",
+    "raw_incident": {
+      "id": "INC-024",
+      "title": "Expired TLS certificate detected in partner-webhook-gateway",
+      "date": "2026-07-25T12:05:00+00:00",
+      "service": "partner-webhook-gateway",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "TLS handshake failure on partner-webhook-gateway ingress. Certificate expired or invalid chain.",
+      "logs": "[ERROR] 2026-07-25 12:05:00 [api-gateway] ssl3_read_bytes: ssl handshake failure: certificate verify failed\n[ERROR] 2026-07-25 12:05:00 [api-gateway] peer closed connection: certificate has expired at 2026-06-14T00:00:00Z\n[WARN]  2026-07-25 12:05:00 [ingress-router] cert-manager.io: order api-ingress-tls failed: 403 Forbidden on .well-known/acme-challenge\n[ERROR] 2026-07-25 12:05:00 [api-gateway] downstream connection error: x509: certificate signed by unknown authority\n[ERROR] 2026-07-25 12:05:00 [api-gateway] envoy[1]: upstream SSL error: 268435581:SSL routines:OPENSSL_internal:CERTIFICATE_VERIFY_FAILED\n[WARN]  2026-07-25 12:05:00 [ingress-router] active cert serial 34:FA:98:12 is expired by 4 hours\n[ERROR] 2026-07-25 12:05:00 [api-gateway] healthcheck failed: 10.0.12.44:443 SSL handshake timeout\n[FATAL] 2026-07-25 12:05:00 [api-gateway] 100% of external HTTPS client requests rejected with TLS Alert 45",
+      "root_cause": "Intermediate certificate chain was omitted from renewed secret, causing strict client handshake failures.",
+      "root_cause_family": "Expired TLS certificate",
+      "fix_steps": [
+        "Issue emergency certificate via Cloudflare Origin CA dashboard",
+        "Update Kubernetes secret tls-ingress-cert with full certificate chain (leaf + intermediate)",
+        "Perform rolling reload on ingress-router pods to pick up updated secret"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Disable SSL verification on Envoy ingress",
+          "reason": "Broke downstream PCI-DSS compliance checks and caused automated security kill-switch to isolate the ingress router."
+        }
+      ],
+      "runbook": "runbooks/tls-cert-rotation.md",
+      "minutes_to_resolve": 15,
+      "engineer": "Kenji Sato",
+      "post_mortem_lesson": "Add automated 30-day certificate expiry alerting in Prometheus and isolate ACME ingress paths.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-025",
+    "title": "Disk full from log growth detected in audit-collector",
+    "service": "audit-collector",
+    "severity": "CRITICAL",
+    "root_cause": "DEBUG logging remained enabled in production audit service, generating 40GB/hour of raw uncompressed logs.",
+    "fix_steps": [
+      "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+      "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+      "Execute growpart and resize2fs to extend volume partition",
+      "Verify logrotate cron script executes successfully"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Execute rm -f /var/log/audit.log while process is active",
+        "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+      }
+    ],
+    "minutes_to_resolve": 12,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:07:58.663528+00:00",
+    "raw_incident": {
+      "id": "INC-025",
+      "title": "Disk full from log growth detected in audit-collector",
+      "date": "2026-07-28T09:31:00+00:00",
+      "service": "audit-collector",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "Disk full alert: /var volume on audit-collector reached 100% capacity.",
+      "logs": "[FATAL] 2026-07-28 09:31:00 [audit-collector] write /var/log/audit/audit.log: no space left on device\n[ERROR] 2026-07-28 09:31:00 [kafka-broker] disk space exhausted on log.dirs=/data/kafka: 0 bytes free (100% utilized)\n[ERROR] 2026-07-28 09:31:00 [audit-collector] logger.go:189: failed to append audit event to disk: ENOSPC\n[WARN]  2026-07-28 09:31:00 [node-exporter] filesystem_free_bytes{mountpoint=\"/var\"} is 0\n[ERROR] 2026-07-28 09:31:00 [kafka-broker] segment.go:88: failed to flush commit log: No space left on device\n[FATAL] 2026-07-28 09:31:00 [kafka-broker] kafka.common.KafkaStorageException: I/O error in append to segment 0000000000049281\n[ERROR] 2026-07-28 09:31:00 [audit-collector] backpressure buffer full: dropping 1500 incoming audit events/sec\n[WARN]  2026-07-28 09:31:00 [systemd] journald: dropped 4920 log messages due to rate limiting and full buffer",
+      "root_cause": "DEBUG logging remained enabled in production audit service, generating 40GB/hour of raw uncompressed logs.",
+      "root_cause_family": "Disk full from log growth",
+      "fix_steps": [
+        "Truncate active log file using : > /var/log/recur/audit.log to immediately release disk blocks",
+        "Set log level back to INFO via dynamic runtime admin endpoint POST /admin/log-level",
+        "Execute growpart and resize2fs to extend volume partition",
+        "Verify logrotate cron script executes successfully"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Execute rm -f /var/log/audit.log while process is active",
+          "reason": "File was unlinked from directory but process held open file descriptor, retaining disk blocks until node restart."
+        }
+      ],
+      "runbook": "runbooks/disk-space-recovery.md",
+      "minutes_to_resolve": 12,
+      "engineer": "Devon Park",
+      "post_mortem_lesson": "Never delete active open logs with rm; use truncate and enforce disk watermarks at 80%.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-026",
+    "title": "Bad config deploy detected in notification-dispatcher",
+    "service": "notification-dispatcher",
+    "severity": "CRITICAL",
+    "root_cause": "ConfigMap migration updated API_URL from http:// to https:// without deploying ingress TLS support.",
+    "fix_steps": [
+      "Execute helm rollback checkout-web-prod to previous stable release revision",
+      "Verify pods transition back to Running state and healthcheck 200 OK",
+      "Correct Helm value template and validate with helm template --validate before future deploys"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+        "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+      }
+    ],
+    "minutes_to_resolve": 11,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:08:01.805298+00:00",
+    "raw_incident": {
+      "id": "INC-026",
+      "title": "Bad config deploy detected in notification-dispatcher",
+      "date": "2026-07-30T16:05:00+00:00",
+      "service": "notification-dispatcher",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "CrashLoopBackOff in notification-dispatcher following release deployment. Malformed configuration.",
+      "logs": "[FATAL] 2026-07-30 16:05:00 [checkout-web] config.go:42: missing required environment variable: STRIPE_SECRET_KEY\n[ERROR] 2026-07-30 16:05:00 [checkout-web] main.go:89: initialization failed: unable to construct payment provider client\n[FATAL] 2026-07-30 16:05:00 [checkout-web] panic: runtime error: invalid memory address or nil pointer dereference\n[ERROR] 2026-07-30 16:05:00 [checkout-web] kubelet: Readiness probe failed: Get \"http://10.0.2.14:8080/healthz\": dial tcp: connection refused\n[WARN]  2026-07-30 16:05:00 [checkout-web] pod checkout-web-7b98d4f4f-zk92l entered CrashLoopBackOff (exit code 2)\n[ERROR] 2026-07-30 16:05:00 [checkout-web] 0/6 replicas available in deployment/checkout-web\n[ERROR] 2026-07-30 16:05:00 [checkout-web] ingress returning 503 Service Unavailable for /v1/checkout\n[WARN]  2026-07-30 16:05:00 [checkout-web] helm release version 4.12.0 status: FAILED_POST_INSTALL",
+      "root_cause": "ConfigMap migration updated API_URL from http:// to https:// without deploying ingress TLS support.",
+      "root_cause_family": "Bad config deploy",
+      "fix_steps": [
+        "Execute helm rollback checkout-web-prod to previous stable release revision",
+        "Verify pods transition back to Running state and healthcheck 200 OK",
+        "Correct Helm value template and validate with helm template --validate before future deploys"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+          "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+        }
+      ],
+      "runbook": "runbooks/config-rollback.md",
+      "minutes_to_resolve": 11,
+      "engineer": "Devon Park",
+      "post_mortem_lesson": "Always run helm rollback immediately when a config rollout fails healthchecks rather than hot-fixing in prod.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-027",
+    "title": "Service memory leak detected in websocket-hub",
+    "service": "websocket-hub",
+    "severity": "CRITICAL",
+    "root_cause": "Python Pillow image resizer held C-level image buffers without calling close() in exception handlers.",
+    "fix_steps": [
+      "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+      "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+      "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+        "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+      }
+    ],
+    "minutes_to_resolve": 14,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:08:03.855846+00:00",
+    "raw_incident": {
+      "id": "INC-027",
+      "title": "Service memory leak detected in websocket-hub",
+      "date": "2026-08-04T17:50:00+00:00",
+      "service": "websocket-hub",
+      "severity": "CRITICAL",
+      "status": "RESOLVED",
+      "alert": "OOMKilled container restart loop in websocket-hub. Memory allocation rate abnormal.",
+      "logs": "[WARN]  2026-08-04 17:50:00 [websocket-hub] container memory usage reached 94.2% of limit (3.78Gi / 4.0Gi)\n[ERROR] 2026-08-04 17:50:00 [websocket-hub] go_memstats_alloc_bytes: continuous growth from 400MB to 3.8GB in 45m\n[FATAL] 2026-08-04 17:50:00 [websocket-hub] kernel: [89124.912] oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,task=websocket-hub\n[ERROR] 2026-08-04 17:50:00 [websocket-hub] kubelet: Container websocket-hub in pod websocket-hub-84b2c-29m1 was OOMKilled (exit code 137)\n[WARN]  2026-08-04 17:50:00 [websocket-hub] 14,000 active client connections abruptly terminated\n[ERROR] 2026-08-04 17:50:00 [websocket-hub] pprof: heap profile indicates 2,400,000 active goroutines blocked in channel write\n[WARN]  2026-08-04 17:50:00 [websocket-hub] client reconnect wave causing CPU spike to 95% on replacement pod\n[FATAL] 2026-08-04 17:50:00 [websocket-hub] replacement pod also reaching 80% memory limit within 15 minutes",
+      "root_cause": "Python Pillow image resizer held C-level image buffers without calling close() in exception handlers.",
+      "root_cause_family": "Service memory leak",
+      "fix_steps": [
+        "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+        "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+        "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+          "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+        }
+      ],
+      "runbook": "runbooks/oom-killed-service.md",
+      "minutes_to_resolve": 14,
+      "engineer": "Aisha Al-Mansoor",
+      "post_mortem_lesson": "Profile heap usage during staging load tests and never remove goroutine context cancellation hooks.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-029",
+    "title": "Bad config deploy detected in checkout-web",
+    "service": "checkout-web",
+    "severity": "HIGH",
+    "root_cause": "Helm chart release referenced internal vault secret key DB_PASSWORD_V2 which was not yet populated.",
+    "fix_steps": [
+      "Execute helm rollback checkout-web-prod to previous stable release revision",
+      "Verify pods transition back to Running state and healthcheck 200 OK",
+      "Correct Helm value template and validate with helm template --validate before future deploys"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+        "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+      }
+    ],
+    "minutes_to_resolve": 12,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:08:54.507967+00:00",
+    "raw_incident": {
+      "id": "INC-029",
+      "title": "Bad config deploy detected in checkout-web",
+      "date": "2026-08-10T02:28:00+00:00",
+      "service": "checkout-web",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "CrashLoopBackOff in checkout-web following release deployment. Malformed configuration.",
+      "logs": "[FATAL] 2026-08-10 02:28:00 [checkout-web] config.go:42: missing required environment variable: STRIPE_SECRET_KEY\n[ERROR] 2026-08-10 02:28:00 [checkout-web] main.go:89: initialization failed: unable to construct payment provider client\n[FATAL] 2026-08-10 02:28:00 [checkout-web] panic: runtime error: invalid memory address or nil pointer dereference\n[ERROR] 2026-08-10 02:28:00 [checkout-web] kubelet: Readiness probe failed: Get \"http://10.0.2.14:8080/healthz\": dial tcp: connection refused\n[WARN]  2026-08-10 02:28:00 [checkout-web] pod checkout-web-7b98d4f4f-zk92l entered CrashLoopBackOff (exit code 2)\n[ERROR] 2026-08-10 02:28:00 [checkout-web] 0/6 replicas available in deployment/checkout-web\n[ERROR] 2026-08-10 02:28:00 [checkout-web] ingress returning 503 Service Unavailable for /v1/checkout\n[WARN]  2026-08-10 02:28:00 [checkout-web] helm release version 4.12.0 status: FAILED_POST_INSTALL",
+      "root_cause": "Helm chart release referenced internal vault secret key DB_PASSWORD_V2 which was not yet populated.",
+      "root_cause_family": "Bad config deploy",
+      "fix_steps": [
+        "Execute helm rollback checkout-web-prod to previous stable release revision",
+        "Verify pods transition back to Running state and healthcheck 200 OK",
+        "Correct Helm value template and validate with helm template --validate before future deploys"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Hot-edit ConfigMap directly with kubectl edit without updating deployment hash",
+          "reason": "Pods do not automatically reload mounted ConfigMap changes without rolling restart or reloader."
+        }
+      ],
+      "runbook": "runbooks/config-rollback.md",
+      "minutes_to_resolve": 12,
+      "engineer": "Elena Rostova",
+      "post_mortem_lesson": "Always run helm rollback immediately when a config rollout fails healthchecks rather than hot-fixing in prod.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "INC-030",
+    "title": "Service memory leak detected in image-resizer",
+    "service": "image-resizer",
+    "severity": "HIGH",
+    "root_cause": "Unbounded in-memory LRU cache in recommendation service lacked eviction policy for anonymous user IDs.",
+    "fix_steps": [
+      "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+      "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+      "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+        "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+      }
+    ],
+    "minutes_to_resolve": 12,
+    "source": "seeded",
+    "retained_at": "2026-11-06T17:08:56.974784+00:00",
+    "raw_incident": {
+      "id": "INC-030",
+      "title": "Service memory leak detected in image-resizer",
+      "date": "2026-08-14T09:57:00+00:00",
+      "service": "image-resizer",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "alert": "OOMKilled container restart loop in image-resizer. Memory allocation rate abnormal.",
+      "logs": "[WARN]  2026-08-14 09:57:00 [websocket-hub] container memory usage reached 94.2% of limit (3.78Gi / 4.0Gi)\n[ERROR] 2026-08-14 09:57:00 [websocket-hub] go_memstats_alloc_bytes: continuous growth from 400MB to 3.8GB in 45m\n[FATAL] 2026-08-14 09:57:00 [websocket-hub] kernel: [89124.912] oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,task=websocket-hub\n[ERROR] 2026-08-14 09:57:00 [websocket-hub] kubelet: Container websocket-hub in pod websocket-hub-84b2c-29m1 was OOMKilled (exit code 137)\n[WARN]  2026-08-14 09:57:00 [websocket-hub] 14,000 active client connections abruptly terminated\n[ERROR] 2026-08-14 09:57:00 [websocket-hub] pprof: heap profile indicates 2,400,000 active goroutines blocked in channel write\n[WARN]  2026-08-14 09:57:00 [websocket-hub] client reconnect wave causing CPU spike to 95% on replacement pod\n[FATAL] 2026-08-14 09:57:00 [websocket-hub] replacement pod also reaching 80% memory limit within 15 minutes",
+      "root_cause": "Unbounded in-memory LRU cache in recommendation service lacked eviction policy for anonymous user IDs.",
+      "root_cause_family": "Service memory leak",
+      "fix_steps": [
+        "Take quick heap profile snapshot via pprof (/debug/pprof/heap) for root cause analysis",
+        "Deploy hotfix adding context cancellation to websocket heartbeat goroutines",
+        "Configure Kubernetes horizontal pod autoscaler to scale on memory threshold while rolling pods every 4 hours as temporary stopgap"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Double pod memory limits in Kubernetes manifest to 16Gi",
+          "reason": "Memory leak was linear; pod simply took 30 minutes longer to consume 16Gi before dying under higher OOM latency."
+        }
+      ],
+      "runbook": "runbooks/oom-killed-service.md",
+      "minutes_to_resolve": 12,
+      "engineer": "Aisha Al-Mansoor",
+      "post_mortem_lesson": "Profile heap usage during staging load tests and never remove goroutine context cancellation hooks.",
+      "source": "seeded"
+    }
+  },
+  {
+    "id": "DEMO-001",
+    "title": "Connection pool exhausted in payments-api. 504 Gateway Timeouts surging.",
+    "service": "checkout-service",
+    "severity": "HIGH",
+    "root_cause": "Postgres connection pool exhaustion",
+    "fix_steps": [
+      "Terminated blocking PID",
+      "Increased pgbouncer default pool size to 250"
+    ],
+    "failed_attempts": [
+      {
+        "step": "Restart pods",
+        "reason": "Flooded DB handshakes"
+      }
+    ],
+    "minutes_to_resolve": 14,
+    "source": "learned",
+    "retained_at": "2026-11-07T04:35:02.486334+00:00",
+    "raw_incident": {
+      "id": "DEMO-001",
+      "service": "checkout-service",
+      "date": "2026-11-07T04:35:02Z",
+      "alert": "Connection pool exhausted in payments-api. 504 Gateway Timeouts surging.",
+      "logs": "[ERROR] 2026-11-06 03:12:01 [payments-api] pool.go:142: pool exhausted: max_connections=200 reached\n[WARN]  2026-11-06 03:12:04 [payments-api] pgbouncer: server connections saturated (200/200 active, 58 queued)\n[ERROR] 2026-11-06 03:12:06 [payments-api] pgxpool: acquire connection failed: context deadline exceeded",
+      "root_cause": "Postgres connection pool exhaustion",
+      "fix_steps": [
+        "Terminated blocking PID",
+        "Increased pgbouncer default pool size to 250"
+      ],
+      "failed_attempts": [
+        {
+          "step": "Restart pods",
+          "reason": "Flooded DB handshakes"
+        }
+      ],
+      "minutes_to_resolve": 14,
+      "runbook": "runbooks/checkout-service.md",
+      "post_mortem_lesson": "Fast resolution using past INC-001 / INC-014 playbook.",
+      "outcome": "RESOLVED",
+      "source": "learned"
+    }
+  }
+]

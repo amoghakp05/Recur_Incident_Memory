@@ -1,0 +1,1003 @@
+[
+  {
+    "id": "act_6b93aa29",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:37:12.265637+00:00"
+  },
+  {
+    "id": "act_16cca56d",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:36:23.367958+00:00"
+  },
+  {
+    "id": "act_2c9ca6d2",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:34:59.079442+00:00"
+  },
+  {
+    "id": "act_8ba61de4",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:33:42.085004+00:00"
+  },
+  {
+    "id": "act_122376be",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:30:10.209411+00:00"
+  },
+  {
+    "id": "act_5ce868f9",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:29:16.619104+00:00"
+  },
+  {
+    "id": "act_157a9cd5",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:29:14.991837+00:00"
+  },
+  {
+    "id": "act_e68162c1",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:29:13.822068+00:00"
+  },
+  {
+    "id": "act_4bcb4b24",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:27:05.545165+00:00"
+  },
+  {
+    "id": "act_0bb8247b",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:26:51.217404+00:00"
+  },
+  {
+    "id": "act_a92effe6",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:26:42.986437+00:00"
+  },
+  {
+    "id": "act_69afd944",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:26:40.487256+00:00"
+  },
+  {
+    "id": "act_ef94b314",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:25:06.026493+00:00"
+  },
+  {
+    "id": "act_a2b1cdd1",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:22:36.147727+00:00"
+  },
+  {
+    "id": "act_69275c1c",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:22:13.243393+00:00"
+  },
+  {
+    "id": "act_eb634e5f",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:21:51.880958+00:00"
+  },
+  {
+    "id": "act_1675f531",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:21:50.358507+00:00"
+  },
+  {
+    "id": "act_f91639b4",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:21:49.079783+00:00"
+  },
+  {
+    "id": "act_92a0280d",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:21:46.500268+00:00"
+  },
+  {
+    "id": "act_0f0d53e0",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:21:23.503840+00:00"
+  },
+  {
+    "id": "act_0544d592",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:20:54.671774+00:00"
+  },
+  {
+    "id": "act_23ff9026",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:20:10.608556+00:00"
+  },
+  {
+    "id": "act_011e4568",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:19:19.995410+00:00"
+  },
+  {
+    "id": "act_97524375",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:18:29.329450+00:00"
+  },
+  {
+    "id": "act_f9b23465",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:18:05.928483+00:00"
+  },
+  {
+    "id": "act_bf71ae9f",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:17:24.519731+00:00"
+  },
+  {
+    "id": "act_c1aa8796",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:17:22.299987+00:00"
+  },
+  {
+    "id": "act_e5f5b247",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T07:17:05.485496+00:00"
+  },
+  {
+    "id": "act_7219a6a6",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T05:55:33.581379+00:00"
+  },
+  {
+    "id": "act_87741da6",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T05:55:31.367273+00:00"
+  },
+  {
+    "id": "act_b06dbc22",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T05:54:15.974417+00:00"
+  },
+  {
+    "id": "act_799fcde2",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:52:58.290156+00:00"
+  },
+  {
+    "id": "act_a94296b8",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:52:10.913164+00:00"
+  },
+  {
+    "id": "act_f00afd42",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:47:44.480657+00:00"
+  },
+  {
+    "id": "act_33108de0",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:45:28.995352+00:00"
+  },
+  {
+    "id": "act_51bda5ee",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:44:05.255580+00:00"
+  },
+  {
+    "id": "act_70de1515",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:42:41.741613+00:00"
+  },
+  {
+    "id": "act_c9b51c2d",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Redis OOM command not allowed when used ...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:42:14.122482+00:00"
+  },
+  {
+    "id": "act_0095e23e",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'PostgreSQL connection pool exhausted. 50...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:42:08.321719+00:00"
+  },
+  {
+    "id": "act_2360d621",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'PostgreSQL connection pool exhausted. 50...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:38:33.069691+00:00"
+  },
+  {
+    "id": "act_2bc62e1e",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'PostgreSQL connection pool exhausted. 50...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:38:29.666879+00:00"
+  },
+  {
+    "id": "act_5396487f",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'PostgreSQL connection pool exhausted. 50...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:38:04.453738+00:00"
+  },
+  {
+    "id": "act_cc7cc23e",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:37:51.910813+00:00"
+  },
+  {
+    "id": "act_e903e180",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:37:05.561095+00:00"
+  },
+  {
+    "id": "act_3279c5aa",
+    "type": "retain",
+    "summary": "Retained incident DEMO-001 (checkout-service) - Postgres connection pool exhaustion",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:35:02.489994+00:00"
+  },
+  {
+    "id": "act_d426bdc9",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Connection pool exhausted in payments-ap...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:35:02.480250+00:00"
+  },
+  {
+    "id": "act_97989185",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:35:02.473129+00:00"
+  },
+  {
+    "id": "act_4e2bc2f0",
+    "type": "recall",
+    "summary": "Recalled 0 past incident memories from ledger for: 'xyz123_nonexistent_service_query_456...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:34:52.940021+00:00"
+  },
+  {
+    "id": "act_ed619f50",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Unknown quantum kernel bitflip in cosmic...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:34:52.938172+00:00"
+  },
+  {
+    "id": "act_757bbcee",
+    "type": "recall",
+    "summary": "Recalled 3 past incident memories from ledger for: 'PostgreSQL pool exhausted max_connection...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:34:45.710302+00:00"
+  },
+  {
+    "id": "act_d7876dd5",
+    "type": "retain",
+    "summary": "Retained incident INC-002 (cart-cache) - Redis cluster maxmemory-policy was configured",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:34:45.708550+00:00"
+  },
+  {
+    "id": "act_6543f32f",
+    "type": "retain",
+    "summary": "Retained incident INC-001 (payments-api) - A slow query in the fraud check module locked",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:34:45.704964+00:00"
+  },
+  {
+    "id": "act_9b0941dc",
+    "type": "retain",
+    "summary": "Retained incident DEMO-001 (checkout-service) - Postgres connection pool exhaustion",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:32:32.903729+00:00"
+  },
+  {
+    "id": "act_15f39628",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Connection pool exhausted in payments-ap...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:32:32.893916+00:00"
+  },
+  {
+    "id": "act_6275529e",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:32:32.887647+00:00"
+  },
+  {
+    "id": "act_080e5175",
+    "type": "recall",
+    "summary": "Recalled 0 past incident memories from ledger for: 'xyz123_nonexistent_service_query_456...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:32:26.150930+00:00"
+  },
+  {
+    "id": "act_e1d3ac81",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories from ledger for: 'Unknown quantum kernel bitflip in cosmic...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:32:26.141376+00:00"
+  },
+  {
+    "id": "act_67bac239",
+    "type": "recall",
+    "summary": "Recalled 3 past incident memories from ledger for: 'PostgreSQL pool exhausted max_connection...'",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:31:20.571735+00:00"
+  },
+  {
+    "id": "act_31f5b973",
+    "type": "retain",
+    "summary": "Retained incident INC-002 (cart-cache) - Redis cluster maxmemory-policy was configured",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:31:20.569587+00:00"
+  },
+  {
+    "id": "act_339af58d",
+    "type": "retain",
+    "summary": "Retained incident INC-001 (payments-api) - A slow query in the fraud check module locked",
+    "latency_ms": 0,
+    "timestamp": "2026-11-07T04:31:20.564322+00:00"
+  },
+  {
+    "id": "act_581d6e59",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-001: Hindsight operation failed after 3 attempts: HINDS",
+    "latency_ms": 4501,
+    "timestamp": "2026-11-07T04:28:48.819332+00:00"
+  },
+  {
+    "id": "act_b02e3805",
+    "type": "recall_error",
+    "summary": "Failed recall for query 'Connection pool exhausted in p': Hindsight operation failed after 3 attem",
+    "latency_ms": 4500,
+    "timestamp": "2026-11-07T04:25:50.966904+00:00"
+  },
+  {
+    "id": "act_88ac0ef9",
+    "type": "reflect_error",
+    "summary": "Failed reflect: Hindsight operation failed after 3 attem",
+    "latency_ms": 4500,
+    "timestamp": "2026-11-07T04:25:46.346662+00:00"
+  },
+  {
+    "id": "act_0c7054b8",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 18285,
+    "timestamp": "2026-11-06T17:59:21.752116+00:00"
+  },
+  {
+    "id": "act_8a6c035e",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 15708,
+    "timestamp": "2026-11-06T17:59:19.189868+00:00"
+  },
+  {
+    "id": "act_d1737eac",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 14335,
+    "timestamp": "2026-11-06T17:59:06.511976+00:00"
+  },
+  {
+    "id": "act_771044e4",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2917,
+    "timestamp": "2026-11-06T17:58:53.394230+00:00"
+  },
+  {
+    "id": "act_628d0c74",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2408,
+    "timestamp": "2026-11-06T17:58:52.884125+00:00"
+  },
+  {
+    "id": "act_7b5c41e2",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 16494,
+    "timestamp": "2026-11-06T17:58:52.160903+00:00"
+  },
+  {
+    "id": "act_388edeb3",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2801,
+    "timestamp": "2026-11-06T17:58:44.455658+00:00"
+  },
+  {
+    "id": "act_45c8a7f4",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 1716,
+    "timestamp": "2026-11-06T17:58:43.368921+00:00"
+  },
+  {
+    "id": "act_f540b843",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2742,
+    "timestamp": "2026-11-06T17:58:22.641244+00:00"
+  },
+  {
+    "id": "act_12c7d22d",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2677,
+    "timestamp": "2026-11-06T17:58:22.572879+00:00"
+  },
+  {
+    "id": "act_78004f1a",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2868,
+    "timestamp": "2026-11-06T17:58:01.925211+00:00"
+  },
+  {
+    "id": "act_52ed7a5a",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2918,
+    "timestamp": "2026-11-06T17:55:56.653484+00:00"
+  },
+  {
+    "id": "act_304c3b00",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 2387,
+    "timestamp": "2026-11-06T17:55:56.133739+00:00"
+  },
+  {
+    "id": "act_7a79750f",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Checkout transaction timeouts surging. P...'",
+    "latency_ms": 3155,
+    "timestamp": "2026-11-06T17:54:41.623392+00:00"
+  },
+  {
+    "id": "act_5537f371",
+    "type": "recall",
+    "summary": "Recalled 2 past incident memories for: 'xyz123_nonexistent_service_query_456...'",
+    "latency_ms": 2189,
+    "timestamp": "2026-11-06T17:46:19.425571+00:00"
+  },
+  {
+    "id": "act_30d12d10",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Unknown quantum kernel bitflip in cosmic...'",
+    "latency_ms": 2056,
+    "timestamp": "2026-11-06T17:46:10.712590+00:00"
+  },
+  {
+    "id": "act_e29afbc4",
+    "type": "retain",
+    "summary": "Retained incident DEMO-001 (checkout-service) - Postgres connection pool exhaustion",
+    "latency_ms": 1572,
+    "timestamp": "2026-11-06T17:45:51.242427+00:00"
+  },
+  {
+    "id": "act_3767ff47",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Connection pool exhausted in payments-ap...'",
+    "latency_ms": 1495,
+    "timestamp": "2026-11-06T17:45:46.019759+00:00"
+  },
+  {
+    "id": "act_36d0e481",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 15403,
+    "timestamp": "2026-11-06T17:45:44.505153+00:00"
+  },
+  {
+    "id": "act_cd13468e",
+    "type": "recall",
+    "summary": "Recalled 2 past incident memories for: 'xyz123_nonexistent_service_query_456...'",
+    "latency_ms": 1297,
+    "timestamp": "2026-11-06T17:41:04.473033+00:00"
+  },
+  {
+    "id": "act_58cea10d",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Unknown quantum kernel bitflip in cosmic...'",
+    "latency_ms": 3092,
+    "timestamp": "2026-11-06T17:40:56.830031+00:00"
+  },
+  {
+    "id": "act_ebab3cfc",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Unknown quantum kernel bitflip in cosmic...'",
+    "latency_ms": 2887,
+    "timestamp": "2026-11-06T17:39:54.796927+00:00"
+  },
+  {
+    "id": "act_47864122",
+    "type": "retain",
+    "summary": "Retained incident DEMO-001 (checkout-service) - Postgres connection pool exhaustion",
+    "latency_ms": 4323,
+    "timestamp": "2026-11-06T17:17:15.343319+00:00"
+  },
+  {
+    "id": "act_4e3b412e",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Connection pool exhausted in payments-ap...'",
+    "latency_ms": 11320,
+    "timestamp": "2026-11-06T17:16:52.611443+00:00"
+  },
+  {
+    "id": "act_74db2643",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 16368,
+    "timestamp": "2026-11-06T17:16:41.281650+00:00"
+  },
+  {
+    "id": "act_98602a8b",
+    "type": "recall",
+    "summary": "Recalled 4 past incident memories for: 'Connection pool exhausted in payments-ap...'",
+    "latency_ms": 1952,
+    "timestamp": "2026-11-06T17:15:52.057305+00:00"
+  },
+  {
+    "id": "act_3ac38ed0",
+    "type": "reflect",
+    "summary": "Synthesized pattern reflection across all retained incidents",
+    "latency_ms": 16853,
+    "timestamp": "2026-11-06T17:15:50.093967+00:00"
+  },
+  {
+    "id": "act_debd2f19",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-019: Hindsight operation failed after 3 attempts: Canno",
+    "latency_ms": 35189,
+    "timestamp": "2026-11-06T17:12:12.160021+00:00"
+  },
+  {
+    "id": "act_6d4792d7",
+    "type": "retain",
+    "summary": "Retained incident INC-030 (image-resizer) - Unbounded in-memory LRU cache in recommendati",
+    "latency_ms": 1458,
+    "timestamp": "2026-11-06T17:08:56.980999+00:00"
+  },
+  {
+    "id": "act_b11b1eaf",
+    "type": "retain",
+    "summary": "Retained incident INC-029 (checkout-web) - Helm chart release referenced internal vault ",
+    "latency_ms": 4888,
+    "timestamp": "2026-11-06T17:08:54.513852+00:00"
+  },
+  {
+    "id": "act_bde35fe9",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-028: Hindsight operation failed after 3 attempts: Canno",
+    "latency_ms": 43750,
+    "timestamp": "2026-11-06T17:08:48.615012+00:00"
+  },
+  {
+    "id": "act_17caceab",
+    "type": "retain",
+    "summary": "Retained incident INC-027 (websocket-hub) - Python Pillow image resizer held C-level imag",
+    "latency_ms": 1043,
+    "timestamp": "2026-11-06T17:08:03.861584+00:00"
+  },
+  {
+    "id": "act_c0656628",
+    "type": "retain",
+    "summary": "Retained incident INC-026 (notification-dispatcher) - ConfigMap migration updated API_URL from http",
+    "latency_ms": 2134,
+    "timestamp": "2026-11-06T17:08:01.810186+00:00"
+  },
+  {
+    "id": "act_d722b845",
+    "type": "retain",
+    "summary": "Retained incident INC-025 (audit-collector) - DEBUG logging remained enabled in production ",
+    "latency_ms": 17270,
+    "timestamp": "2026-11-06T17:07:58.668845+00:00"
+  },
+  {
+    "id": "act_ee7ec158",
+    "type": "retain",
+    "summary": "Retained incident INC-024 (partner-webhook-gateway) - Intermediate certificate chain was omitted fr",
+    "latency_ms": 5909,
+    "timestamp": "2026-11-06T17:07:40.389250+00:00"
+  },
+  {
+    "id": "act_230f7cfa",
+    "type": "retain",
+    "summary": "Retained incident INC-023 (rate-limiter) - Redis cluster memory fragmentation ratio hit ",
+    "latency_ms": 1416,
+    "timestamp": "2026-11-06T17:07:33.471431+00:00"
+  },
+  {
+    "id": "act_f207f0a8",
+    "type": "retain",
+    "summary": "Retained incident INC-022 (checkout-service) - Prepared statement leaks in billing worker ex",
+    "latency_ms": 827,
+    "timestamp": "2026-11-06T17:07:31.047250+00:00"
+  },
+  {
+    "id": "act_85bd18b4",
+    "type": "retain",
+    "summary": "Retained incident INC-021 (iot-gateway) - Smart device firmware update rollout caused 5",
+    "latency_ms": 44507,
+    "timestamp": "2026-11-06T17:07:29.211861+00:00"
+  },
+  {
+    "id": "act_35a1358e",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-020: Hindsight operation failed after 3 attempts: Canno",
+    "latency_ms": 37533,
+    "timestamp": "2026-11-06T17:06:43.697018+00:00"
+  },
+  {
+    "id": "act_c3455239",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-019: Hindsight operation failed after 3 attempts: Canno",
+    "latency_ms": 36102,
+    "timestamp": "2026-11-06T17:06:05.161858+00:00"
+  },
+  {
+    "id": "act_a3e0fe10",
+    "type": "retain",
+    "summary": "Retained incident INC-018 (kafka-broker) - Logrotate daemon failed to execute due to wro",
+    "latency_ms": 1549,
+    "timestamp": "2026-11-06T17:05:28.056632+00:00"
+  },
+  {
+    "id": "act_1a8960d3",
+    "type": "retain",
+    "summary": "Retained incident INC-017 (api-gateway) - cert-manager ACME challenge ingress rule was ",
+    "latency_ms": 5066,
+    "timestamp": "2026-11-06T17:05:25.501406+00:00"
+  },
+  {
+    "id": "act_be8f2f5b",
+    "type": "retain",
+    "summary": "Retained incident INC-016 (auth-token-cache) - Cart serializer cache stampede filled 16GB RA",
+    "latency_ms": 613,
+    "timestamp": "2026-11-06T17:05:19.426146+00:00"
+  },
+  {
+    "id": "act_f601d03e",
+    "type": "retain",
+    "summary": "Retained incident INC-015 (billing-worker) - Connection leak in connection pooler acquire ",
+    "latency_ms": 9463,
+    "timestamp": "2026-11-06T17:05:17.807296+00:00"
+  },
+  {
+    "id": "act_bad82321",
+    "type": "retain",
+    "summary": "Retained incident INC-014 (telemetry-receiver) - Wildcard MQTT subscription 'devices/+/telemet",
+    "latency_ms": 2702,
+    "timestamp": "2026-11-06T17:05:07.337458+00:00"
+  },
+  {
+    "id": "act_e1016c8d",
+    "type": "retain",
+    "summary": "Retained incident INC-013 (recommendation-engine) - Goroutine leak in websocket connection heartb",
+    "latency_ms": 1465,
+    "timestamp": "2026-11-06T17:05:03.630336+00:00"
+  },
+  {
+    "id": "act_d4370f45",
+    "type": "retain",
+    "summary": "Retained incident INC-012 (shipping-calc) - Environment variable TIMEOUT_MS was deployed ",
+    "latency_ms": 1399,
+    "timestamp": "2026-11-06T17:05:01.147421+00:00"
+  },
+  {
+    "id": "act_ab12acb4",
+    "type": "retain",
+    "summary": "Retained incident INC-011 (ingest-pipeline) - Kafka broker segment retention policy was ove",
+    "latency_ms": 1584,
+    "timestamp": "2026-11-06T17:04:58.743006+00:00"
+  },
+  {
+    "id": "act_eeabc44c",
+    "type": "retain",
+    "summary": "Retained incident INC-010 (auth-service) - Let's Encrypt automated HTTP-01 challenge fai",
+    "latency_ms": 3054,
+    "timestamp": "2026-11-06T17:04:56.153113+00:00"
+  },
+  {
+    "id": "act_bece0878",
+    "type": "retain",
+    "summary": "Retained incident INC-009 (cart-cache) - Cluster policy set to noeviction while cache ",
+    "latency_ms": 1458,
+    "timestamp": "2026-11-06T17:04:52.093204+00:00"
+  },
+  {
+    "id": "act_bda42679",
+    "type": "retain",
+    "summary": "Retained incident INC-008 (customer-db-proxy) - Slow report aggregation query locked order ta",
+    "latency_ms": 1530,
+    "timestamp": "2026-11-06T17:04:49.629253+00:00"
+  },
+  {
+    "id": "act_85892141",
+    "type": "retain",
+    "summary": "Retained incident INC-007 (device-tracker) - Broker TCP keepalive timeout was set too high",
+    "latency_ms": 1414,
+    "timestamp": "2026-11-06T17:04:47.094309+00:00"
+  },
+  {
+    "id": "act_8cd6b1bf",
+    "type": "retain",
+    "summary": "Retained incident INC-006 (image-resizer) - Unbounded in-memory LRU cache in recommendati",
+    "latency_ms": 767,
+    "timestamp": "2026-11-06T17:04:44.675175+00:00"
+  },
+  {
+    "id": "act_0f9a07c3",
+    "type": "retain",
+    "summary": "Retained incident INC-005 (checkout-web) - Helm chart release referenced internal vault ",
+    "latency_ms": 5585,
+    "timestamp": "2026-11-06T17:04:42.901787+00:00"
+  },
+  {
+    "id": "act_6e0a9da9",
+    "type": "retain",
+    "summary": "Retained incident INC-004 (search-indexer) - Core dumps from intermittent crashes accumula",
+    "latency_ms": 1522,
+    "timestamp": "2026-11-06T17:04:36.312046+00:00"
+  },
+  {
+    "id": "act_32a376c1",
+    "type": "retain",
+    "summary": "Retained incident INC-003 (ingress-router) - Internal mTLS root CA expired after 365 days;",
+    "latency_ms": 955,
+    "timestamp": "2026-11-06T17:04:33.783626+00:00"
+  },
+  {
+    "id": "act_a61603fe",
+    "type": "retain",
+    "summary": "Retained incident INC-002 (session-store) - Volatile-lru policy failed because telemetry ",
+    "latency_ms": 742,
+    "timestamp": "2026-11-06T17:04:31.822423+00:00"
+  },
+  {
+    "id": "act_dc90c618",
+    "type": "retain",
+    "summary": "Retained incident INC-001 (payments-api) - Unindexed audit query on fraud check held ope",
+    "latency_ms": 2520,
+    "timestamp": "2026-11-06T17:04:30.076525+00:00"
+  },
+  {
+    "id": "act_9dcb477a",
+    "type": "retain",
+    "summary": "Retained incident INC-015 (billing-worker) - Connection leak in connection pooler acquire ",
+    "latency_ms": 4822,
+    "timestamp": "2026-11-06T17:03:08.747147+00:00"
+  },
+  {
+    "id": "act_79ec42bf",
+    "type": "retain",
+    "summary": "Retained incident INC-014 (telemetry-receiver) - Wildcard MQTT subscription 'devices/+/telemet",
+    "latency_ms": 4217,
+    "timestamp": "2026-11-06T17:03:02.919237+00:00"
+  },
+  {
+    "id": "act_c4e961a5",
+    "type": "retain",
+    "summary": "Retained incident INC-013 (recommendation-engine) - Goroutine leak in websocket connection heartb",
+    "latency_ms": 5293,
+    "timestamp": "2026-11-06T17:02:57.696908+00:00"
+  },
+  {
+    "id": "act_0b8f7c10",
+    "type": "retain",
+    "summary": "Retained incident INC-012 (shipping-calc) - Environment variable TIMEOUT_MS was deployed ",
+    "latency_ms": 4577,
+    "timestamp": "2026-11-06T17:02:51.398672+00:00"
+  },
+  {
+    "id": "act_62d5cf3d",
+    "type": "retain",
+    "summary": "Retained incident INC-011 (ingest-pipeline) - Kafka broker segment retention policy was ove",
+    "latency_ms": 5070,
+    "timestamp": "2026-11-06T17:02:45.815743+00:00"
+  },
+  {
+    "id": "act_163906ca",
+    "type": "retain",
+    "summary": "Retained incident INC-010 (auth-service) - Let's Encrypt automated HTTP-01 challenge fai",
+    "latency_ms": 5276,
+    "timestamp": "2026-11-06T17:02:39.740744+00:00"
+  },
+  {
+    "id": "act_3fdfd46c",
+    "type": "retain",
+    "summary": "Retained incident INC-009 (cart-cache) - Cluster policy set to noeviction while cache ",
+    "latency_ms": 6323,
+    "timestamp": "2026-11-06T17:02:33.458484+00:00"
+  },
+  {
+    "id": "act_99da5471",
+    "type": "retain",
+    "summary": "Retained incident INC-008 (customer-db-proxy) - Slow report aggregation query locked order ta",
+    "latency_ms": 5748,
+    "timestamp": "2026-11-06T17:02:26.132043+00:00"
+  },
+  {
+    "id": "act_a69ebad5",
+    "type": "retain",
+    "summary": "Retained incident INC-007 (device-tracker) - Broker TCP keepalive timeout was set too high",
+    "latency_ms": 25875,
+    "timestamp": "2026-11-06T17:02:19.379522+00:00"
+  },
+  {
+    "id": "act_dddd2679",
+    "type": "retain",
+    "summary": "Retained incident INC-006 (image-resizer) - Unbounded in-memory LRU cache in recommendati",
+    "latency_ms": 11676,
+    "timestamp": "2026-11-06T17:01:52.498867+00:00"
+  },
+  {
+    "id": "act_5028c00e",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-005: Hindsight operation failed after 3 attempts: Canno",
+    "latency_ms": 47076,
+    "timestamp": "2026-11-06T17:01:39.817775+00:00"
+  },
+  {
+    "id": "act_bbcd9af1",
+    "type": "retain",
+    "summary": "Retained incident INC-004 (search-indexer) - Core dumps from intermittent crashes accumula",
+    "latency_ms": 15953,
+    "timestamp": "2026-11-06T17:00:51.739911+00:00"
+  },
+  {
+    "id": "act_23e61c6e",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-003: Hindsight operation failed after 3 attempts: Serve",
+    "latency_ms": 35991,
+    "timestamp": "2026-11-06T17:00:34.782640+00:00"
+  },
+  {
+    "id": "act_367f2810",
+    "type": "retain",
+    "summary": "Retained incident INC-002 (session-store) - Volatile-lru policy failed because telemetry ",
+    "latency_ms": 39944,
+    "timestamp": "2026-11-06T16:59:57.789826+00:00"
+  },
+  {
+    "id": "act_1f688fe3",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-001: Hindsight operation failed after 3 attempts: Serve",
+    "latency_ms": 37520,
+    "timestamp": "2026-11-06T16:59:16.837962+00:00"
+  },
+  {
+    "id": "act_7fea8c06",
+    "type": "recall",
+    "summary": "Recalled 3 past incident memories for: 'PostgreSQL pool exhausted max_connection...'",
+    "latency_ms": 2056,
+    "timestamp": "2026-11-06T16:38:45.679334+00:00"
+  },
+  {
+    "id": "act_092b10f4",
+    "type": "retain",
+    "summary": "Retained incident INC-002 (cart-cache) - Redis cluster maxmemory-policy was configured",
+    "latency_ms": 24197,
+    "timestamp": "2026-11-06T16:38:43.621539+00:00"
+  },
+  {
+    "id": "act_7c8c4d4d",
+    "type": "retain",
+    "summary": "Retained incident INC-001 (payments-api) - A slow query in the fraud check module locked",
+    "latency_ms": 7678,
+    "timestamp": "2026-11-06T16:38:19.420309+00:00"
+  },
+  {
+    "id": "act_12ad0abe",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-001: Hindsight operation failed after 3 attempts: Canno",
+    "latency_ms": 45929,
+    "timestamp": "2026-11-06T16:24:16.482235+00:00"
+  },
+  {
+    "id": "act_92b2eb0d",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-001: Cannot connect to host api.hindsight.vectorize.io:",
+    "latency_ms": 10383,
+    "timestamp": "2026-11-06T16:18:09.434781+00:00"
+  },
+  {
+    "id": "act_de645625",
+    "type": "retain_error",
+    "summary": "Failed retaining INC-002: Cannot connect to host api.hindsight.vectorize.io:",
+    "latency_ms": 11257,
+    "timestamp": "2026-11-06T16:16:04.436655+00:00"
+  },
+  {
+    "id": "act_8d2bafab",
+    "type": "retain",
+    "summary": "Retained incident INC-001 (payments-api) - A slow query in the fraud check module locked",
+    "latency_ms": 11803,
+    "timestamp": "2026-11-06T16:15:53.174875+00:00"
+  }
+]
